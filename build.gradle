@@ -1,0 +1,39 @@
+plugins {
+    id 'java-library'
+}
+
+group 'org.neuronbit.xpi'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
+dependencies {
+    compileOnly "commons-logging:commons-logging:${jcl_version}"
+    compileOnly "log4j:log4j:${log4j_version}"
+    compileOnly "org.apache.logging.log4j:log4j-api:${log4j2_version}"
+    compileOnly "org.slf4j:slf4j-api:${slf4j_version}"
+    implementation 'org.eclipse.collections:eclipse-collections:10.4.0'
+    implementation 'org.javassist:javassist:3.28.0-GA'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.0'
+    testImplementation('org.junit.platform:junit-platform-launcher:1.5.2')
+    testImplementation "org.hamcrest:hamcrest:${hamcrest_version}"
+    testImplementation "org.mockito:mockito-core:${mockito_version}"
+    testImplementation "commons-logging:commons-logging:${jcl_version}"
+    testImplementation "log4j:log4j:${log4j_version}"
+    testImplementation "org.apache.logging.log4j:log4j-api:${log4j2_version}"
+    testImplementation "org.slf4j:slf4j-api:${slf4j_version}"
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
