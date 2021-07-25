@@ -56,8 +56,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.neuronbit.xpi.common.extension.ExtensionClassLoader.getLoadingStrategies;
 import static org.neuronbit.xpi.common.extension.ExtensionLoader.getExtensionLoader;
-import static org.neuronbit.xpi.common.extension.ExtensionLoader.getLoadingStrategies;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -301,69 +301,6 @@ public class ExtensionLoaderTest {
     }
 
     @Test
-    public void test_replaceExtension() throws Exception {
-        try {
-            getExtensionLoader(AddExt1.class).getExtension("Manual2");
-            fail();
-        } catch (IllegalStateException expected) {
-            assertThat(expected.getMessage(), containsString("No such extension org.neuronbit.xpi.common.extension.ext8_add.AddExt1 by name Manual"));
-        }
-
-        {
-            AddExt1 ext = getExtensionLoader(AddExt1.class).getExtension("impl1");
-
-            assertThat(ext, instanceOf(AddExt1Impl1.class));
-            assertEquals("impl1", getExtensionLoader(AddExt1.class).getExtensionName(AddExt1Impl1.class));
-        }
-        {
-            getExtensionLoader(AddExt1.class).replaceExtension("impl1", AddExt1_ManualAdd2.class);
-            AddExt1 ext = getExtensionLoader(AddExt1.class).getExtension("impl1");
-
-            assertThat(ext, instanceOf(AddExt1_ManualAdd2.class));
-            assertEquals("impl1", getExtensionLoader(AddExt1.class).getExtensionName(AddExt1_ManualAdd2.class));
-        }
-        ExtensionLoader.resetExtensionLoader(AddExt1.class);
-    }
-
-    @Test
-    public void test_replaceExtension_Adaptive() throws Exception {
-        ExtensionLoader<AddExt3> loader = getExtensionLoader(AddExt3.class);
-
-        AddExt3 adaptive = loader.getAdaptiveExtension();
-        assertFalse(adaptive instanceof AddExt3_ManualAdaptive);
-
-        loader.replaceExtension(null, AddExt3_ManualAdaptive.class);
-
-        adaptive = loader.getAdaptiveExtension();
-        assertTrue(adaptive instanceof AddExt3_ManualAdaptive);
-        ExtensionLoader.resetExtensionLoader(AddExt3.class);
-    }
-
-    @Test
-    public void test_replaceExtension_ExceptionWhenNotExistedExtension() throws Exception {
-        AddExt1 ext = getExtensionLoader(AddExt1.class).getExtension("impl1");
-
-        try {
-            getExtensionLoader(AddExt1.class).replaceExtension("NotExistedExtension", AddExt1_ManualAdd1.class);
-            fail();
-        } catch (IllegalStateException expected) {
-            assertThat(expected.getMessage(), containsString("Extension name NotExistedExtension doesn't exist (Extension interface org.neuronbit.xpi.common.extension.ext8_add.AddExt1)"));
-        }
-    }
-
-    @Test
-    public void test_replaceExtension_Adaptive_ExceptionWhenNotExistedExtension() throws Exception {
-        ExtensionLoader<AddExt4> loader = getExtensionLoader(AddExt4.class);
-
-        try {
-            loader.replaceExtension(null, AddExt4_ManualAdaptive.class);
-            fail();
-        } catch (IllegalStateException expected) {
-            assertThat(expected.getMessage(), containsString("Adaptive Extension doesn't exist (Extension interface org.neuronbit.xpi.common.extension.ext8_add.AddExt4)"));
-        }
-    }
-
-    @Test
     public void test_InitError() throws Exception {
         ExtensionLoader<InitErrorExt> loader = getExtensionLoader(InitErrorExt.class);
 
@@ -506,8 +443,8 @@ public class ExtensionLoaderTest {
 
     @Test
     public void testDuplicatedImplWithoutOverriddenStrategy() {
-        List<LoadingStrategy> loadingStrategies = ExtensionLoader.getLoadingStrategies();
-        ExtensionLoader.setLoadingStrategies(new DubboExternalLoadingStrategyTest(false),
+        List<LoadingStrategy> loadingStrategies = getLoadingStrategies();
+        ExtensionClassLoader.setLoadingStrategies(new DubboExternalLoadingStrategyTest(false),
                 new DubboInternalLoadingStrategyTest(false));
         ExtensionLoader<DuplicatedWithoutOverriddenExt> extensionLoader = ExtensionLoader.getExtensionLoader(DuplicatedWithoutOverriddenExt.class);
         try {
@@ -518,20 +455,20 @@ public class ExtensionLoaderTest {
             assertThat(expected.getMessage(), containsString("cause: Duplicate extension org.neuronbit.xpi.common.extension.duplicated.DuplicatedWithoutOverriddenExt name duplicated"));
         }finally {
             //recover the loading strategies
-            ExtensionLoader.setLoadingStrategies(loadingStrategies.toArray(new LoadingStrategy[loadingStrategies.size()]));
+            ExtensionClassLoader.setLoadingStrategies(loadingStrategies.toArray(new LoadingStrategy[loadingStrategies.size()]));
         }
     }
 
     @Test
     public void testDuplicatedImplWithOverriddenStrategy() {
-        List<LoadingStrategy> loadingStrategies = ExtensionLoader.getLoadingStrategies();
-        ExtensionLoader.setLoadingStrategies(new DubboExternalLoadingStrategyTest(true),
+        List<LoadingStrategy> loadingStrategies = getLoadingStrategies();
+        ExtensionClassLoader.setLoadingStrategies(new DubboExternalLoadingStrategyTest(true),
                 new DubboInternalLoadingStrategyTest(true));
         ExtensionLoader<DuplicatedOverriddenExt> extensionLoader = ExtensionLoader.getExtensionLoader(DuplicatedOverriddenExt.class);
         DuplicatedOverriddenExt duplicatedOverriddenExt = extensionLoader.getExtension("duplicated");
         assertEquals("DuplicatedOverriddenExt1", duplicatedOverriddenExt.echo());
         //recover the loading strategies
-        ExtensionLoader.setLoadingStrategies(loadingStrategies.toArray(new LoadingStrategy[loadingStrategies.size()]));
+        ExtensionClassLoader.setLoadingStrategies(loadingStrategies.toArray(new LoadingStrategy[loadingStrategies.size()]));
     }
 
     /**
