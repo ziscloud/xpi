@@ -1,0 +1,2 @@
+adaptive=org.neuronbit.xpi.common.extension.inject.AdaptiveExtensionDependencyProvider
+spi=org.neuronbit.xpi.common.extension.inject.SpiExtensionDependencyProvider

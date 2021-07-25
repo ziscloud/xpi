@@ -14,39 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neuronbit.xpi.common.extension.factory;
+package org.neuronbit.xpi.common.extension.inject;
 
-import org.neuronbit.xpi.common.extension.Adaptive;
-import org.neuronbit.xpi.common.extension.ExtensionFactory;
 import org.neuronbit.xpi.common.extension.ExtensionLoader;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.neuronbit.xpi.common.extension.SPI;
 
 /**
- * AdaptiveExtensionFactory
+ * SpiExtensionFactory
  */
-@Adaptive
-public class AdaptiveExtensionFactory implements ExtensionFactory {
-
-    private final List<ExtensionFactory> factories;
-
-    public AdaptiveExtensionFactory() {
-        ExtensionLoader<ExtensionFactory> loader = ExtensionLoader.getExtensionLoader(ExtensionFactory.class);
-        List<ExtensionFactory> list = new ArrayList<ExtensionFactory>();
-        for (String name : loader.getSupportedExtensions()) {
-            list.add(loader.getExtension(name));
-        }
-        factories = Collections.unmodifiableList(list);
-    }
+public class SpiExtensionDependencyProvider implements ExtensionDependencyProvider {
 
     @Override
     public <T> T getExtension(Class<T> type, String name) {
-        for (ExtensionFactory factory : factories) {
-            T extension = factory.getExtension(type, name);
-            if (extension != null) {
-                return extension;
+        if (type.isInterface() && type.isAnnotationPresent(SPI.class)) {
+            ExtensionLoader<T> loader = ExtensionLoader.getExtensionLoader(type);
+            if (!loader.getSupportedExtensions().isEmpty()) {
+                return loader.getAdaptiveExtension();
             }
         }
         return null;

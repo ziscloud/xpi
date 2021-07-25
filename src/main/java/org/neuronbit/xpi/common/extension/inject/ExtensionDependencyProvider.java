@@ -14,26 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neuronbit.xpi.common.extension.factory;
+package org.neuronbit.xpi.common.extension.inject;
 
-import org.neuronbit.xpi.common.extension.ExtensionFactory;
-import org.neuronbit.xpi.common.extension.ExtensionLoader;
 import org.neuronbit.xpi.common.extension.SPI;
 
 /**
- * SpiExtensionFactory
+ * ExtensionFactory
  */
-public class SpiExtensionFactory implements ExtensionFactory {
+@SPI
+public interface ExtensionDependencyProvider {
 
-    @Override
-    public <T> T getExtension(Class<T> type, String name) {
-        if (type.isInterface() && type.isAnnotationPresent(SPI.class)) {
-            ExtensionLoader<T> loader = ExtensionLoader.getExtensionLoader(type);
-            if (!loader.getSupportedExtensions().isEmpty()) {
-                return loader.getAdaptiveExtension();
-            }
-        }
-        return null;
-    }
+    /**
+     * Get extension.
+     *
+     * @param type object type.
+     * @param name object name.
+     * @return object instance.
+     */
+    <T> T getExtension(Class<T> type, String name);
 
 }

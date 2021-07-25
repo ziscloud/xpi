@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neuronbit.xpi.common.extension;
+package org.neuronbit.xpi.common.extension.inject;
 
 import java.lang.annotation.*;
 

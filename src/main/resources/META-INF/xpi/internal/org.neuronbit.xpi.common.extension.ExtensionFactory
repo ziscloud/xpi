@@ -1,2 +1,0 @@
-adaptive=org.neuronbit.xpi.common.extension.factory.AdaptiveExtensionFactory
-spi=org.neuronbit.xpi.common.extension.factory.SpiExtensionFactory

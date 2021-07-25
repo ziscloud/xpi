@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Logger factory
+ * Logger inject
  */
 public class LoggerFactory {
 

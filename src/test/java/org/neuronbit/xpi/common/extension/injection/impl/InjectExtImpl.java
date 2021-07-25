@@ -16,7 +16,7 @@
  */
 package org.neuronbit.xpi.common.extension.injection.impl;
 
-import org.neuronbit.xpi.common.extension.DisableInject;
+import org.neuronbit.xpi.common.extension.inject.DisableInject;
 import org.neuronbit.xpi.common.extension.ext1.SimpleExt;
 import org.neuronbit.xpi.common.extension.injection.InjectExt;
 

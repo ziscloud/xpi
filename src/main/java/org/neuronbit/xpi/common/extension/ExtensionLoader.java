@@ -18,6 +18,8 @@ package org.neuronbit.xpi.common.extension;
 
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.context.Lifecycle;
+import org.neuronbit.xpi.common.extension.inject.DisableInject;
+import org.neuronbit.xpi.common.extension.inject.ExtensionDependencyProvider;
 import org.neuronbit.xpi.common.extension.support.ActivateComparator;
 import org.neuronbit.xpi.common.extension.support.WrapperComparator;
 import org.neuronbit.xpi.common.lang.Prioritized;
@@ -89,7 +91,7 @@ public class ExtensionLoader<T> {
     private static final ConcurrentMap<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<>(64);
 
     private final Class<?> type;
-    private final ExtensionFactory objectFactory;
+    private final ExtensionDependencyProvider objectFactory;
 
     private final ConcurrentMap<Class<?>, String> cachedNames = new ConcurrentHashMap<>();
     private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>();
@@ -139,9 +141,9 @@ public class ExtensionLoader<T> {
         return asList(strategies);
     }
 
-    private ExtensionLoader(Class<?> type) {
+    ExtensionLoader(Class<?> type) {
         this.type = type;
-        objectFactory = (type == ExtensionFactory.class ? null : ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension());
+        objectFactory = (type == ExtensionDependencyProvider.class ? null : ExtensionLoader.getExtensionLoader(ExtensionDependencyProvider.class).getAdaptiveExtension());
     }
 
     private static <T> boolean withExtensionAnnotation(Class<T> type) {
@@ -663,9 +665,7 @@ public class ExtensionLoader<T> {
             }
             injectExtension(instance);
 
-
             if (wrap) {
-
                 List<Class<?>> wrapperClassesList = new ArrayList<>();
                 if (cachedWrapperClasses != null) {
                     wrapperClassesList.addAll(cachedWrapperClasses);
