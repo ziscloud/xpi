@@ -1,0 +1,2 @@
+adaptive=org.neuronbit.xpi.common.extension.adaptive.impl.HasAdaptiveExt_ManualAdaptive
+impl1=org.neuronbit.xpi.common.extension.adaptive.impl.HasAdaptiveExtImpl1

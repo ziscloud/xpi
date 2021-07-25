@@ -1,0 +1,5 @@
+slf4j=org.neuronbit.xpi.common.logger.slf4j.Slf4jLoggerAdapter
+jcl=org.neuronbit.xpi.common.logger.jcl.JclLoggerAdapter
+log4j=org.neuronbit.xpi.common.logger.log4j.Log4jLoggerAdapter
+jdk=org.neuronbit.xpi.common.logger.jdk.JdkLoggerAdapter
+log4j2=org.neuronbit.xpi.common.logger.log4j2.Log4j2LoggerAdapter

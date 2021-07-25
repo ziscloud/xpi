@@ -66,10 +66,9 @@ import static org.neuronbit.xpi.common.constants.Constants.REMOVE_VALUE_PREFIX;
 /**
  * this class is
  * at present designed to be singleton or static (by itself totally static or uses some static fields).
- * So the instances returned from them are of process or classloader scope. If you want to support
- * multiple dubbo servers in a single process, you may need to refactor these three classes.
+ * So the instances returned from them are of process or classloader scope.
  * <p>
- * Load dubbo extensions
+ * Load extensions
  * <ul>
  * <li>auto inject dependency extension </li>
  * <li>auto wrap extension in wrapper </li>
@@ -82,42 +81,35 @@ import static org.neuronbit.xpi.common.constants.Constants.REMOVE_VALUE_PREFIX;
  * @see Activate
  */
 public class ExtensionLoader<T> {
-
     private static final Logger logger = LoggerFactory.getLogger(ExtensionLoader.class);
 
     private static final Pattern NAME_SEPARATOR = Pattern.compile("\\s*[,]+\\s*");
 
     private static final ConcurrentMap<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>(64);
-
     private static final ConcurrentMap<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<>(64);
 
     private final Class<?> type;
-
     private final ExtensionFactory objectFactory;
 
     private final ConcurrentMap<Class<?>, String> cachedNames = new ConcurrentHashMap<>();
-
     private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>();
-
     private final Map<String, Object> cachedActivates = Collections.synchronizedMap(new LinkedHashMap<>());
     private final Map<String, Set<String>> cachedActivateGroups = Collections.synchronizedMap(new LinkedHashMap<>());
     private final Map<String, String[]> cachedActivateValues = Collections.synchronizedMap(new LinkedHashMap<>());
     private final ConcurrentMap<String, Holder<Object>> cachedInstances = new ConcurrentHashMap<>();
     private final Holder<Object> cachedAdaptiveInstance = new Holder<>();
-    private volatile Class<?> cachedAdaptiveClass = null;
     private String cachedDefaultName;
+    private volatile Class<?> cachedAdaptiveClass = null;
     private volatile Throwable createAdaptiveInstanceError;
-
     private Set<Class<?>> cachedWrapperClasses;
 
     private Map<String, IllegalStateException> exceptions = new ConcurrentHashMap<>();
-
     private static volatile LoadingStrategy[] strategies = loadLoadingStrategies();
 
     /**
      * Record all unacceptable exceptions when using SPI
      */
-    private Set<String> unacceptableExceptions = new ConcurrentHashSet<>();
+    private final Set<String> unacceptableExceptions = new ConcurrentHashSet<>();
 
     public static void setLoadingStrategies(LoadingStrategy... strategies) {
         if (ArrayUtils.isNotEmpty(strategies)) {

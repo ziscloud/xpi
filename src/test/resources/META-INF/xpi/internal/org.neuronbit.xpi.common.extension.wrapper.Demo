@@ -1,0 +1,4 @@
+demo=org.neuronbit.xpi.common.extension.wrapper.impl.DemoImpl
+wrapper=org.neuronbit.xpi.common.extension.wrapper.impl.DemoWrapper
+wrapper2=org.neuronbit.xpi.common.extension.wrapper.impl.DemoWrapper2
+demo2=org.neuronbit.xpi.common.extension.wrapper.impl.DemoImpl
