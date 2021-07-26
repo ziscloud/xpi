@@ -175,7 +175,7 @@ local.properties
 ### Gradle template
 .gradle
 **/build/
-!src/**/build/
+!core/src/**/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -196,3 +196,6 @@ gradle-app.setting
 # Used by previous versions of JEnv
 .jenv-version
 
+# Used by publish
+publish.sh
+secret-keys.gpg

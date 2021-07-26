@@ -1,2 +1,5 @@
 rootProject.name = 'xpi'
 
+include 'spring'
+include 'core'
+

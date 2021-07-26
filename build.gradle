@@ -1,40 +1,115 @@
-plugins {
-    id 'java-library'
+allprojects {
+    group 'org.neuronbit.xpi'
+    version '1.0-SNAPSHOT'
 }
 
-group 'org.neuronbit.xpi'
-version '1.0-SNAPSHOT'
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'signing'
 
-repositories {
-    mavenCentral()
-}
+    repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/public/'
+        }
+        mavenLocal()
+        mavenCentral()
+    }
 
-compileJava {
-    options.encoding = "UTF-8"
-    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-}
+    compileJava {
+        options.encoding = "UTF-8"
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
 
-dependencies {
-    compileOnly "commons-logging:commons-logging:${jcl_version}"
-    compileOnly "log4j:log4j:${log4j_version}"
-    compileOnly "org.apache.logging.log4j:log4j-api:${log4j2_version}"
-    compileOnly "org.slf4j:slf4j-api:${slf4j_version}"
-    implementation 'org.eclipse.collections:eclipse-collections:10.4.0'
-    implementation 'org.javassist:javassist:3.28.0-GA'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.0'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.5.2'
-    testImplementation "org.hamcrest:hamcrest:${hamcrest_version}"
-    testImplementation "org.mockito:mockito-core:${mockito_version}"
-    testImplementation "org.mockito:mockito-inline:${mockito_version}"
-    testImplementation "commons-logging:commons-logging:${jcl_version}"
-    testImplementation "log4j:log4j:${log4j_version}"
-    testImplementation "org.apache.logging.log4j:log4j-api:${log4j2_version}"
-    testImplementation "org.slf4j:slf4j-api:${slf4j_version}"
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-}
+    javadoc {
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
 
-test {
-    useJUnitPlatform()
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    clean {
+        delete 'out'
+    }
+
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.0'
+        testImplementation 'org.junit.platform:junit-platform-launcher:1.5.2'
+        testImplementation "org.hamcrest:hamcrest:${hamcrest_version}"
+        testImplementation "org.mockito:mockito-core:${mockito_version}"
+        testImplementation "org.mockito:mockito-inline:${mockito_version}"
+        testImplementation "commons-logging:commons-logging:${jcl_version}"
+        testImplementation "log4j:log4j:${log4j_version}"
+        testImplementation "org.apache.logging.log4j:log4j-api:${log4j2_version}"
+        testImplementation "org.slf4j:slf4j-api:${slf4j_version}"
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    publishing {
+        repositories {
+            maven {
+                name = "nexus"
+                credentials(PasswordCredentials)
+                def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            }
+        }
+        publications {
+            mavenJava(MavenPublication) {
+                from project.components.java
+                versionMapping {
+                    usage('java-api') {
+                        fromResolutionOf('runtimeClasspath')
+                    }
+                    usage('java-runtime') {
+                        fromResolutionResult()
+                    }
+                }
+                pom {
+                    name = "xpi"
+                    description = "Extended Java SPI."
+                    url = "https://github.com/ziscloud/xpi"
+                    inceptionYear = "2021"
+
+                    scm {
+                        url = "https://github.com/ziscloud/xpi.git"
+                        connection = "scm:https://github.com/ziscloud/xpi.git"
+                        developerConnection = "scm:https://github.com/ziscloud/xpi.git"
+                    }
+
+                    licenses {
+                        license {
+                            name.set("The Apache License, Version 2.0")
+                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = "ziscloud"
+                            name = "Shunyun Wong"
+                            email = "ziscloud@gmail.com"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        sign publishing.publications.mavenJava
+    }
 }
