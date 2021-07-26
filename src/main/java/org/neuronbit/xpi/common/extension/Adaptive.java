@@ -19,9 +19,9 @@ package org.neuronbit.xpi.common.extension;
 import java.lang.annotation.*;
 
 /**
- * Provide helpful information for {@link ExtensionLoader} to inject dependency extension instance.
+ * Provide helpful information for {@link ExtensionFactory} to inject dependency extension instance.
  *
- * @see ExtensionLoader
+ * @see ExtensionFactory
  * @see URL
  */
 @Documented

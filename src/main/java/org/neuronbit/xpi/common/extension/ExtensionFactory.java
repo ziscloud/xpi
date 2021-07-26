@@ -19,7 +19,7 @@ package org.neuronbit.xpi.common.extension;
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.context.Lifecycle;
 import org.neuronbit.xpi.common.extension.inject.DisableInject;
-import org.neuronbit.xpi.common.extension.inject.ExtensionDependencyProvider;
+import org.neuronbit.xpi.common.extension.inject.InjectProvider;
 import org.neuronbit.xpi.common.extension.support.ActivateComparator;
 import org.neuronbit.xpi.common.extension.support.WrapperComparator;
 import org.neuronbit.xpi.common.lang.Prioritized;
@@ -71,15 +71,17 @@ import static org.neuronbit.xpi.common.constants.Constants.REMOVE_VALUE_PREFIX;
  * @see Adaptive
  * @see Activate
  */
-public class ExtensionLoader<T> {
-    private static final Logger logger = LoggerFactory.getLogger(ExtensionLoader.class);
+public class ExtensionFactory<T> {
+    private static final Logger logger = LoggerFactory.getLogger(ExtensionFactory.class);
 
-    private static final ConcurrentMap<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>(64);
+    private static final ConcurrentMap<Class<?>, ExtensionFactory<?>> EXTENSION_FACTORY = new ConcurrentHashMap<>(64);
     private static final ConcurrentMap<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<>(64);
 
     private final Class<?> type;
     private final String cachedDefaultName;
-    private final ExtensionDependencyProvider dependencyProvider;
+
+    private final InjectProvider injectProvider;
+    private final ExtensionClassLoader extensionClassLoader;
 
     private final Map<String, Set<String>> cachedActivateGroups = Collections.synchronizedMap(new LinkedHashMap<>());
     private final Map<String, String[]> cachedActivateValues = Collections.synchronizedMap(new LinkedHashMap<>());
@@ -87,12 +89,11 @@ public class ExtensionLoader<T> {
     private final Holder<Object> cachedAdaptiveInstance = new Holder<>();
 
     private volatile Throwable createAdaptiveInstanceError;
-    private final ExtensionClassLoader extensionClassLoader;
 
-    ExtensionLoader(Class<?> type) {
+    ExtensionFactory(Class<?> type) {
         this.type = type;
         this.extensionClassLoader = new ExtensionClassLoader(type);
-        this.dependencyProvider = (type == ExtensionDependencyProvider.class ? null : ExtensionLoader.getExtensionLoader(ExtensionDependencyProvider.class).getAdaptiveExtension());
+        this.injectProvider = (type == InjectProvider.class ? null : ExtensionFactory.getExtensionFactory(InjectProvider.class).getAdaptiveExtension());
         this.cachedDefaultName = cacheDefaultExtensionName();
     }
 
@@ -101,7 +102,7 @@ public class ExtensionLoader<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
+    public static <T> ExtensionFactory<T> getExtensionFactory(Class<T> type) {
         if (type == null) {
             throw new IllegalArgumentException("Extension type == null");
         }
@@ -113,17 +114,17 @@ public class ExtensionLoader<T> {
                                                        ") is not an extension, because it is NOT annotated with @" + SPI.class.getSimpleName() + "!");
         }
 
-        ExtensionLoader<T> loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
-        if (loader == null) {
-            EXTENSION_LOADERS.putIfAbsent(type, new ExtensionLoader<T>(type));
-            loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
+        ExtensionFactory<T> factory = (ExtensionFactory<T>) EXTENSION_FACTORY.get(type);
+        if (factory == null) {
+            EXTENSION_FACTORY.putIfAbsent(type, new ExtensionFactory<T>(type));
+            factory = (ExtensionFactory<T>) EXTENSION_FACTORY.get(type);
         }
-        return loader;
+        return factory;
     }
 
     // For testing purposes only
-    public static void resetExtensionLoader(Class type) {
-        ExtensionLoader loader = EXTENSION_LOADERS.get(type);
+    public static void resetExtensionFactory(Class<?> type) {
+        ExtensionFactory<?> loader = EXTENSION_FACTORY.get(type);
         if (loader != null) {
             // Remove all instances associated with this loader as well
             Map<String, Class<?>> classes = loader.extensionClassLoader.getExtensionClasses();
@@ -131,7 +132,7 @@ public class ExtensionLoader<T> {
                 EXTENSION_INSTANCES.remove(entry.getValue());
             }
             classes.clear();
-            EXTENSION_LOADERS.remove(type);
+            EXTENSION_FACTORY.remove(type);
         }
     }
 
@@ -152,7 +153,7 @@ public class ExtensionLoader<T> {
         // e.g. org.neuronbit.xpi.registry.client.metadata.MetadataUtils.localMetadataService
         // EXTENSION_INSTANCES.clear();
 
-        EXTENSION_LOADERS.clear();
+        EXTENSION_FACTORY.clear();
     }
 
     public String getExtensionName(Class<?> extensionClass) {
@@ -215,7 +216,7 @@ public class ExtensionLoader<T> {
             if (cachedActivateGroups.size() == 0) {
                 synchronized (cachedActivateGroups) {
                     if (cachedActivateGroups.size() == 0) {
-                        for (Map.Entry<String, Object> entry :  extensionClassLoader.getActivates().entrySet()) {
+                        for (Map.Entry<String, Object> entry : extensionClassLoader.getActivates().entrySet()) {
                             String name = entry.getKey();
                             Object activate = entry.getValue();
 
@@ -224,10 +225,7 @@ public class ExtensionLoader<T> {
                             if (activate instanceof Activate) {
                                 activateGroup = ((Activate) activate).group();
                                 activateValue = ((Activate) activate).value();
-                            } /*else if (activate instanceof com.alibaba.dubbo.common.extension.Activate) {
-                                activateGroup = ((com.alibaba.dubbo.common.extension.Activate) activate).group();
-                                activateValue = ((com.alibaba.dubbo.common.extension.Activate) activate).value();
-                            }*/ else {
+                            } else {
                                 continue;
                             }
                             cachedActivateGroups.put(name, new HashSet<>(Arrays.asList(activateGroup)));
@@ -276,7 +274,7 @@ public class ExtensionLoader<T> {
         List<T> activateExtensions = new ArrayList<>();
         TreeMap<Class<?>, T> activateExtensionsMap = new TreeMap<>(ActivateComparator.COMPARATOR);
 
-        for (Map.Entry<String, Object> entry :  extensionClassLoader.getActivates().entrySet()) {
+        for (Map.Entry<String, Object> entry : extensionClassLoader.getActivates().entrySet()) {
             String name = entry.getKey();
             Object activate = entry.getValue();
             if (!(activate instanceof Activate)) {
@@ -430,7 +428,7 @@ public class ExtensionLoader<T> {
         try {
             Class<?> c = this.getExtensionClass(name);
             return c != null;
-        } catch (Exception e){
+        } catch (Exception e) {
             //ignore exception
             return false;
         }
@@ -470,8 +468,7 @@ public class ExtensionLoader<T> {
         Object instance = cachedAdaptiveInstance.get();
         if (instance == null) {
             if (createAdaptiveInstanceError != null) {
-                throw new IllegalStateException("Failed to create adaptive instance: " +
-                                                        createAdaptiveInstanceError.toString(),
+                throw new IllegalStateException("Failed to create adaptive instance: " + createAdaptiveInstanceError.toString(),
                         createAdaptiveInstanceError);
             }
 
@@ -483,7 +480,7 @@ public class ExtensionLoader<T> {
                         cachedAdaptiveInstance.set(instance);
                     } catch (Throwable t) {
                         createAdaptiveInstanceError = t;
-                        throw new IllegalStateException("Failed to create adaptive instance: " + t.toString(), t);
+                        throw new IllegalStateException("Failed to create adaptive instance: " + t, t);
                     }
                 }
             }
@@ -494,7 +491,7 @@ public class ExtensionLoader<T> {
 
     @SuppressWarnings("unchecked")
     private T createExtension(String name, boolean wrap) {
-        Class<?> clazz =getExtensionClass(name);
+        Class<?> clazz = getExtensionClass(name);
         try {
             T instance = (T) EXTENSION_INSTANCES.get(clazz);
             if (instance == null) {
@@ -536,8 +533,7 @@ public class ExtensionLoader<T> {
     }
 
     private T injectExtension(T instance) {
-
-        if (dependencyProvider == null) {
+        if (injectProvider == null) {
             return instance;
         }
 
@@ -559,7 +555,7 @@ public class ExtensionLoader<T> {
 
                 try {
                     String property = getSetterProperty(method);
-                    Object object = dependencyProvider.getExtension(pt, property);
+                    Object object = injectProvider.getInstance(pt, property);
                     if (object != null) {
                         method.invoke(instance, object);
                     }

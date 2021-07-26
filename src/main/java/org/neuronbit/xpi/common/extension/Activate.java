@@ -28,12 +28,12 @@ import java.lang.annotation.*;
  * <li>{@link Activate#group()} specifies group criteria. Framework SPI defines the valid group values.
  * <li>{@link Activate#value()} specifies parameter key in {@link ActivateCriteria} criteria.
  * </ol>
- * SPI provider can call {@link ExtensionLoader#getActivateExtension(ActivateCriteria, String, String)} to find out all activated
+ * SPI provider can call {@link ExtensionFactory#getActivateExtension(ActivateCriteria, String, String)} to find out all activated
  * extensions with the given criteria.
  *
  * @see SPI
  * @see ActivateCriteria
- * @see ExtensionLoader
+ * @see ExtensionFactory
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -41,10 +41,10 @@ import java.lang.annotation.*;
 public @interface Activate {
     /**
      * Activate the current extension when one of the groups matches. The group passed into
-     * {@link ExtensionLoader#getActivateExtension(ActivateCriteria, String, String)} will be used for matching.
+     * {@link ExtensionFactory#getActivateExtension(ActivateCriteria, String, String)} will be used for matching.
      *
      * @return group names to match
-     * @see ExtensionLoader#getActivateExtension(ActivateCriteria, String, String)
+     * @see ExtensionFactory#getActivateExtension(ActivateCriteria, String, String)
      */
     String[] group() default {};
 
@@ -56,8 +56,8 @@ public @interface Activate {
      * </p>
      *
      * @return URL parameter keys
-     * @see ExtensionLoader#getActivateExtension(ActivateCriteria, String)
-     * @see ExtensionLoader#getActivateExtension(ActivateCriteria, String, String)
+     * @see ExtensionFactory#getActivateExtension(ActivateCriteria, String)
+     * @see ExtensionFactory#getActivateExtension(ActivateCriteria, String, String)
      */
     String[] value() default {};
 

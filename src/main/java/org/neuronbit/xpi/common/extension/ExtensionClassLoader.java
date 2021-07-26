@@ -39,17 +39,15 @@ public class ExtensionClassLoader {
     private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>();
     private final ConcurrentMap<Class<?>, String> cachedNames = new ConcurrentHashMap<>();
     private final Map<String, Object> cachedActivates = Collections.synchronizedMap(new LinkedHashMap<>());
-    private volatile Class<?> cachedAdaptiveClass = null;
-    private Set<Class<?>> cachedWrapperClasses = null;
 
-
-    private Map<String, IllegalStateException> exceptions = new ConcurrentHashMap<>();
-
+    private final Map<String, IllegalStateException> exceptions = new ConcurrentHashMap<>();
     /**
      * Record all unacceptable exceptions when using SPI
      */
     private final Set<String> unacceptableExceptions = new ConcurrentHashSet<>();
 
+    private volatile Class<?> cachedAdaptiveClass = null;
+    private Set<Class<?>> cachedWrapperClasses = null;
 
     public ExtensionClassLoader(Class<?> type) {
         this.type = type;
@@ -84,17 +82,7 @@ public class ExtensionClassLoader {
     }
 
     public Map<String, Class<?>> getExtensionClasses() {
-        Map<String, Class<?>> classes = cachedClasses.get();
-        if (classes == null) {
-            synchronized (cachedClasses) {
-                classes = cachedClasses.get();
-                if (classes == null) {
-                    classes = loadExtensionClasses();
-                    cachedClasses.set(classes);
-                }
-            }
-        }
-        return classes;
+        return loadExtensionClasses();
     }
 
     public Class<?> getExtensionClass(String name) {
@@ -106,7 +94,7 @@ public class ExtensionClassLoader {
     }
 
     public Set<Class<?>> getExtensionWrapperClasses() {
-        getExtensionClasses();
+        loadExtensionClasses();
         return cachedWrapperClasses;
     }
 
@@ -118,27 +106,37 @@ public class ExtensionClassLoader {
      * synchronized in getExtensionClasses
      */
     private Map<String, Class<?>> loadExtensionClasses() {
-        Map<String, Class<?>> extensionClasses = new HashMap<>();
-
-        for (LoadingStrategy strategy : strategies) {
-            loadDirectory(extensionClasses, type.getName(), strategy);
+        Map<String, Class<?>> classes = cachedClasses.get();
+        if (classes != null) {
+            return classes;
         }
+        synchronized (cachedClasses) {
+            classes = cachedClasses.get();
+            if (classes != null) {
+                return classes;
+            }
 
-        return extensionClasses;
+            Map<String, Class<?>> extensionClasses = new HashMap<>();
+            for (LoadingStrategy strategy : strategies) {
+                loadDirectory(extensionClasses, type.getName(), strategy);
+            }
+            cachedClasses.set(extensionClasses);
+            return extensionClasses;
+        }
     }
 
     public String getExtensionName(Class<?> extensionClass) {
-        getExtensionClasses();
+        loadExtensionClasses();
         return cachedNames.get(extensionClass);
     }
 
     public Map<String, Object> getActivates() {
-        getExtensionClasses();
+        loadExtensionClasses();
         return cachedActivates;
     }
 
     public Class<?> getAdaptiveExtensionClass(String name) {
-        getExtensionClasses();
+        loadExtensionClasses();
         if (cachedAdaptiveClass != null) {
             return cachedAdaptiveClass;
         }
@@ -148,7 +146,7 @@ public class ExtensionClassLoader {
     private Class<?> createAdaptiveExtensionClass(String name) {
         String code = new AdaptiveClassCodeGenerator(type, name).generate();
         ClassLoader classLoader = findClassLoader();
-        org.neuronbit.xpi.common.compiler.Compiler compiler = ExtensionLoader.getExtensionLoader(org.neuronbit.xpi.common.compiler.Compiler.class).getAdaptiveExtension();
+        org.neuronbit.xpi.common.compiler.Compiler compiler = ExtensionFactory.getExtensionFactory(org.neuronbit.xpi.common.compiler.Compiler.class).getAdaptiveExtension();
         return compiler.compile(code, classLoader);
     }
 
@@ -158,9 +156,9 @@ public class ExtensionClassLoader {
             Enumeration<URL> urls = null;
             ClassLoader classLoader = findClassLoader();
 
-            // try to load from ExtensionLoader's ClassLoader first
+            // try to load from ExtensionFactory's ClassLoader first
             if (strategy.preferExtensionClassLoader()) {
-                ClassLoader extensionLoaderClassLoader = ExtensionLoader.class.getClassLoader();
+                ClassLoader extensionLoaderClassLoader = ExtensionFactory.class.getClassLoader();
                 if (ClassLoader.getSystemClassLoader() != extensionLoaderClassLoader) {
                     urls = extensionLoaderClassLoader.getResources(fileName);
                 }
@@ -212,7 +210,10 @@ public class ExtensionClassLoader {
                                 loadClass(extensionClasses, resourceURL, Class.forName(clazz, true, classLoader), name, overridden);
                             }
                         } catch (Throwable t) {
-                            IllegalStateException e = new IllegalStateException("Failed to load extension class (interface: " + type + ", class line: " + line + ") in " + resourceURL + ", cause: " + t.getMessage(), t);
+                            IllegalStateException e =
+                                    new IllegalStateException("Failed to load extension class (interface: "
+                                                                      + type + ", class line: " + line + ") in "
+                                                                      + resourceURL + ", cause: " + t.getMessage(), t);
                             exceptions.put(line, e);
                         }
                     }
@@ -247,7 +248,6 @@ public class ExtensionClassLoader {
         } else if (isWrapperClass(clazz)) {
             cacheWrapperClass(clazz);
         } else {
-            clazz.getConstructor();
             if (StringUtils.isEmpty(name)) {
                 name = findAnnotationName(clazz);
                 if (name.length() == 0) {
@@ -269,7 +269,6 @@ public class ExtensionClassLoader {
     private static ClassLoader findClassLoader() {
         return ClassUtils.getClassLoader(ExtensionClassLoader.class);
     }
-
 
     /**
      * put clazz in extensionClasses
@@ -326,7 +325,7 @@ public class ExtensionClassLoader {
      * @throws IllegalStateException when extension with the same name has already been registered.
      */
     public void addExtension(String name, Class<?> clazz) {
-        getExtensionClasses(); // load classes
+        loadExtensionClasses();
 
         if (!type.isAssignableFrom(clazz)) {
             throw new IllegalStateException("Input type " +
@@ -366,12 +365,6 @@ public class ExtensionClassLoader {
         Activate activate = clazz.getAnnotation(Activate.class);
         if (activate != null) {
             cachedActivates.put(name, activate);
-        } else {
-            // support com.alibaba.dubbo.common.extension.Activate
-           /* com.alibaba.dubbo.common.extension.Activate oldActivate = clazz.getAnnotation(com.alibaba.dubbo.common.extension.Activate.class);
-            if (oldActivate != null) {
-                cachedActivates.put(name, oldActivate);
-            }*/
         }
     }
 
@@ -399,7 +392,6 @@ public class ExtensionClassLoader {
         }
         cachedWrapperClasses.add(clazz);
     }
-
 
     private IllegalStateException findException(String name) {
         StringBuilder buf = new StringBuilder("No such extension " + type.getName() + " by name " + name);

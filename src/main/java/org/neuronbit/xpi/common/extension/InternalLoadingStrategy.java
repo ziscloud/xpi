@@ -17,7 +17,7 @@
 package org.neuronbit.xpi.common.extension;
 
 /**
- * Dubbo internal {@link LoadingStrategy}
+ * Internal {@link LoadingStrategy}
  *
  */
 public class InternalLoadingStrategy implements LoadingStrategy {

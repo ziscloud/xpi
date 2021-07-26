@@ -14,19 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neuronbit.xpi.common.extension;
+package org.neuronbit.xpi.common.extension.inject;
 
-import org.neuronbit.xpi.common.extension.compatible.CompatibleExt;
-import org.neuronbit.xpi.common.extension.compatible.impl.CompatibleExtImpl2;
+import org.neuronbit.xpi.common.extension.SPI;
 
-import org.junit.jupiter.api.Test;
+/**
+ * ExtensionFactory
+ */
+@SPI
+public interface InjectProvider {
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+    /**
+     * Get extension.
+     *
+     * @param type object type.
+     * @param name object name.
+     * @return object instance.
+     */
+    <T> T getInstance(Class<T> type, String name);
 
-public class ExtensionLoader_Compatible_Test {
-
-    @Test
-    public void test_getExtension() throws Exception {
-        assertTrue(ExtensionLoader.getExtensionLoader(CompatibleExt.class).getExtension("impl2") instanceof CompatibleExtImpl2);
-    }
 }

@@ -18,13 +18,13 @@ package org.neuronbit.xpi.common.extension.adaptive.impl;
 
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.Adaptive;
-import org.neuronbit.xpi.common.extension.ExtensionLoader;
+import org.neuronbit.xpi.common.extension.ExtensionFactory;
 import org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt;
 
 @Adaptive
 public class HasAdaptiveExt_ManualAdaptive implements HasAdaptiveExt {
     public String echo(ActivateCriteria url, String s) {
-        HasAdaptiveExt addExt1 = ExtensionLoader.getExtensionLoader(HasAdaptiveExt.class).getExtension(url.getParameter("key"));
+        HasAdaptiveExt addExt1 = ExtensionFactory.getExtensionFactory(HasAdaptiveExt.class).getExtension(url.getParameter("key"));
         return addExt1.echo(url, s);
     }
 }

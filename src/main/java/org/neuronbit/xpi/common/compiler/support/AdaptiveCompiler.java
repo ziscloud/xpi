@@ -18,7 +18,7 @@ package org.neuronbit.xpi.common.compiler.support;
 
 import org.neuronbit.xpi.common.compiler.Compiler;
 import org.neuronbit.xpi.common.extension.Adaptive;
-import org.neuronbit.xpi.common.extension.ExtensionLoader;
+import org.neuronbit.xpi.common.extension.ExtensionFactory;
 
 /**
  * AdaptiveCompiler. (SPI, Singleton, ThreadSafe)
@@ -35,7 +35,7 @@ public class AdaptiveCompiler implements Compiler {
     @Override
     public Class<?> compile(String code, ClassLoader classLoader) {
         Compiler compiler;
-        ExtensionLoader<Compiler> loader = ExtensionLoader.getExtensionLoader(Compiler.class);
+        ExtensionFactory<Compiler> loader = ExtensionFactory.getExtensionFactory(Compiler.class);
         String name = DEFAULT_COMPILER; // copy reference
         if (name != null && name.length() > 0) {
             compiler = loader.getExtension(name);

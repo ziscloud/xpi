@@ -17,7 +17,7 @@
 package org.neuronbit.xpi.common.extension.support;
 
 import org.neuronbit.xpi.common.extension.Activate;
-import org.neuronbit.xpi.common.extension.ExtensionLoader;
+import org.neuronbit.xpi.common.extension.ExtensionFactory;
 import org.neuronbit.xpi.common.extension.SPI;
 import org.neuronbit.xpi.common.utils.ArrayUtils;
 
@@ -52,9 +52,9 @@ public class ActivateComparator implements Comparator<Class> {
         ActivateInfo a2 = parseActivate(o2);
 
         if ((a1.applicableToCompare() || a2.applicableToCompare()) && inf != null) {
-            ExtensionLoader<?> extensionLoader = ExtensionLoader.getExtensionLoader(inf);
+            ExtensionFactory<?> extensionFactory = ExtensionFactory.getExtensionFactory(inf);
             if (a1.applicableToCompare()) {
-                String n2 = extensionLoader.getExtensionName(o2);
+                String n2 = extensionFactory.getExtensionName(o2);
                 if (a1.isLess(n2)) {
                     return -1;
                 }
@@ -65,7 +65,7 @@ public class ActivateComparator implements Comparator<Class> {
             }
 
             if (a2.applicableToCompare()) {
-                String n1 = extensionLoader.getExtensionName(o1);
+                String n1 = extensionFactory.getExtensionName(o1);
                 if (a2.isLess(n1)) {
                     return 1;
                 }

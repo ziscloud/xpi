@@ -16,21 +16,23 @@
  */
 package org.neuronbit.xpi.common.extension.inject;
 
+import org.neuronbit.xpi.common.extension.ExtensionFactory;
 import org.neuronbit.xpi.common.extension.SPI;
 
 /**
- * ExtensionFactory
+ * SpiExtensionFactory
  */
-@SPI
-public interface ExtensionDependencyProvider {
+public class SpiInjectProvider implements InjectProvider {
 
-    /**
-     * Get extension.
-     *
-     * @param type object type.
-     * @param name object name.
-     * @return object instance.
-     */
-    <T> T getExtension(Class<T> type, String name);
+    @Override
+    public <T> T getInstance(Class<T> type, String name) {
+        if (type.isInterface() && type.isAnnotationPresent(SPI.class)) {
+            ExtensionFactory<T> loader = ExtensionFactory.getExtensionFactory(type);
+            if (!loader.getSupportedExtensions().isEmpty()) {
+                return loader.getAdaptiveExtension();
+            }
+        }
+        return null;
+    }
 
 }

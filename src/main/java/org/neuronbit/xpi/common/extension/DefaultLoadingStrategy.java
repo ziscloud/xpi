@@ -17,7 +17,7 @@
 package org.neuronbit.xpi.common.extension;
 
 /**
- * Dubbo {@link LoadingStrategy}
+ * Default {@link LoadingStrategy}
  *
  */
 public class DefaultLoadingStrategy implements LoadingStrategy {

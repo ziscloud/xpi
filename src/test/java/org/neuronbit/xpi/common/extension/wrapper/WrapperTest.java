@@ -16,7 +16,7 @@
  */
 package org.neuronbit.xpi.common.extension.wrapper;
 
-import org.neuronbit.xpi.common.extension.ExtensionLoader;
+import org.neuronbit.xpi.common.extension.ExtensionFactory;
 import org.neuronbit.xpi.common.extension.Wrapper;
 import org.neuronbit.xpi.common.extension.wrapper.impl.DemoWrapper;
 import org.neuronbit.xpi.common.extension.wrapper.impl.DemoWrapper2;
@@ -33,9 +33,9 @@ public class WrapperTest {
 
     @Test
     public void testWrapper() {
-        Demo demoWrapper = ExtensionLoader.getExtensionLoader(Demo.class).getExtension("demo");
+        Demo demoWrapper = ExtensionFactory.getExtensionFactory(Demo.class).getExtension("demo");
         assertTrue(demoWrapper instanceof DemoWrapper);
-        Demo demoWrapper2 = ExtensionLoader.getExtensionLoader(Demo.class).getExtension("demo2");
+        Demo demoWrapper2 = ExtensionFactory.getExtensionFactory(Demo.class).getExtension("demo2");
         assertTrue(demoWrapper2 instanceof DemoWrapper2);
     }
 }

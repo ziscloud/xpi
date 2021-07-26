@@ -14,25 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neuronbit.xpi.common.extension.inject;
+package org.neuronbit.xpi.common.extension;
 
-import org.neuronbit.xpi.common.extension.ExtensionLoader;
-import org.neuronbit.xpi.common.extension.SPI;
+import org.neuronbit.xpi.common.extension.compatible.CompatibleExt;
+import org.neuronbit.xpi.common.extension.compatible.impl.CompatibleExtImpl2;
 
-/**
- * SpiExtensionFactory
- */
-public class SpiExtensionDependencyProvider implements ExtensionDependencyProvider {
+import org.junit.jupiter.api.Test;
 
-    @Override
-    public <T> T getExtension(Class<T> type, String name) {
-        if (type.isInterface() && type.isAnnotationPresent(SPI.class)) {
-            ExtensionLoader<T> loader = ExtensionLoader.getExtensionLoader(type);
-            if (!loader.getSupportedExtensions().isEmpty()) {
-                return loader.getAdaptiveExtension();
-            }
-        }
-        return null;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class ExtensionFactory_Compatible_Test {
+
+    @Test
+    public void test_getExtension() throws Exception {
+        assertTrue(ExtensionFactory.getExtensionFactory(CompatibleExt.class).getExtension("impl2") instanceof CompatibleExtImpl2);
     }
-
 }

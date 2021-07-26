@@ -18,13 +18,13 @@ package org.neuronbit.xpi.common.extension.ext8_add.impl;
 
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.Adaptive;
-import org.neuronbit.xpi.common.extension.ExtensionLoader;
+import org.neuronbit.xpi.common.extension.ExtensionFactory;
 import org.neuronbit.xpi.common.extension.ext8_add.AddExt2;
 
 @Adaptive
 public class AddExt2_ManualAdaptive implements AddExt2 {
     public String echo(ActivateCriteria url, String s) {
-        AddExt2 addExt1 = ExtensionLoader.getExtensionLoader(AddExt2.class).getExtension(url.getParameter("add.ext2"));
+        AddExt2 addExt1 = ExtensionFactory.getExtensionFactory(AddExt2.class).getExtension(url.getParameter("add.ext2"));
         return addExt1.echo(url, s);
     }
 }

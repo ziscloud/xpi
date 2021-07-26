@@ -16,7 +16,7 @@
  */
 package org.neuronbit.xpi.common.logger;
 
-import org.neuronbit.xpi.common.extension.ExtensionLoader;
+import org.neuronbit.xpi.common.extension.ExtensionFactory;
 import org.neuronbit.xpi.common.logger.jcl.JclLoggerAdapter;
 import org.neuronbit.xpi.common.logger.jdk.JdkLoggerAdapter;
 import org.neuronbit.xpi.common.logger.log4j.Log4jLoggerAdapter;
@@ -81,7 +81,7 @@ public class LoggerFactory {
 
     public static void setLoggerAdapter(String loggerAdapter) {
         if (loggerAdapter != null && loggerAdapter.length() > 0) {
-            setLoggerAdapter(ExtensionLoader.getExtensionLoader(LoggerAdapter.class).getExtension(loggerAdapter));
+            setLoggerAdapter(ExtensionFactory.getExtensionFactory(LoggerAdapter.class).getExtension(loggerAdapter));
         }
     }
 

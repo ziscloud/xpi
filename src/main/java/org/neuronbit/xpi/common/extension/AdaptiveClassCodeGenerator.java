@@ -63,7 +63,7 @@ public class AdaptiveClassCodeGenerator {
                     + "String methodName = arg%d.getMethodName();\n";
 
 
-    private static final String CODE_EXTENSION_ASSIGNMENT = "%s extension = (%<s)%s.getExtensionLoader(%s.class).getExtension(extName);\n";
+    private static final String CODE_EXTENSION_ASSIGNMENT = "%s extension = (%<s)%s.getExtensionFactory(%s.class).getExtension(extName);\n";
 
     private static final String CODE_EXTENSION_METHOD_INVOKE_ARGUMENT = "arg%d";
 
@@ -120,7 +120,7 @@ public class AdaptiveClassCodeGenerator {
      * generate imports
      */
     private String generateImports() {
-        return String.format(CODE_IMPORTS, ExtensionLoader.class.getName());
+        return String.format(CODE_IMPORTS, ExtensionFactory.class.getName());
     }
 
     /**
@@ -289,7 +289,7 @@ public class AdaptiveClassCodeGenerator {
      * @return
      */
     private String generateExtensionAssignment() {
-        return String.format(CODE_EXTENSION_ASSIGNMENT, type.getName(), ExtensionLoader.class.getSimpleName(), type.getName());
+        return String.format(CODE_EXTENSION_ASSIGNMENT, type.getName(), ExtensionFactory.class.getSimpleName(), type.getName());
     }
 
     /**

@@ -21,7 +21,7 @@ import org.neuronbit.xpi.common.compiler.support.AdaptiveCompiler;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
-public class ExtensionLoader_Adaptive_UseJdkCompiler_Test extends ExtensionLoader_Adaptive_Test {
+public class ExtensionFactory_Adaptive_UseJdkCompiler_Test extends ExtensionFactory_Adaptive_Test {
     @BeforeAll
     public static void setUp() throws Exception {
         AdaptiveCompiler.setDefaultCompiler("jdk");

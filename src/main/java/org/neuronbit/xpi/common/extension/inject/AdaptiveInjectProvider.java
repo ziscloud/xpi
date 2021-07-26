@@ -17,7 +17,7 @@
 package org.neuronbit.xpi.common.extension.inject;
 
 import org.neuronbit.xpi.common.extension.Adaptive;
-import org.neuronbit.xpi.common.extension.ExtensionLoader;
+import org.neuronbit.xpi.common.extension.ExtensionFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,13 +27,13 @@ import java.util.List;
  * AdaptiveExtensionFactory
  */
 @Adaptive
-public class AdaptiveExtensionDependencyProvider implements ExtensionDependencyProvider {
+public class AdaptiveInjectProvider implements InjectProvider {
 
-    private final List<ExtensionDependencyProvider> factories;
+    private final List<InjectProvider> factories;
 
-    public AdaptiveExtensionDependencyProvider() {
-        ExtensionLoader<ExtensionDependencyProvider> loader = ExtensionLoader.getExtensionLoader(ExtensionDependencyProvider.class);
-        List<ExtensionDependencyProvider> list = new ArrayList<ExtensionDependencyProvider>();
+    public AdaptiveInjectProvider() {
+        ExtensionFactory<InjectProvider> loader = ExtensionFactory.getExtensionFactory(InjectProvider.class);
+        List<InjectProvider> list = new ArrayList<>();
         for (String name : loader.getSupportedExtensions()) {
             list.add(loader.getExtension(name));
         }
@@ -41,9 +41,9 @@ public class AdaptiveExtensionDependencyProvider implements ExtensionDependencyP
     }
 
     @Override
-    public <T> T getExtension(Class<T> type, String name) {
-        for (ExtensionDependencyProvider factory : factories) {
-            T extension = factory.getExtension(type, name);
+    public <T> T getInstance(Class<T> type, String name) {
+        for (InjectProvider factory : factories) {
+            T extension = factory.getInstance(type, name);
             if (extension != null) {
                 return extension;
             }
