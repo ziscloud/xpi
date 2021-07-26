@@ -1,0 +1,1 @@
+spring=org.neuronbit.xpi.spring.extension.SpringInjectProvider
