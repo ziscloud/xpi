@@ -33,11 +33,10 @@ public class XxxProtocol implements Protocol {
 }
 ```
 
-## Configuration in config module
-
-In Dubbo config module, all SPI points have related attributes or labels, we can choose the specific SPI implementation by using its name. Like:
-
-<dubbo:protocol name="xxx" />
+get the extensino instanc via:
+```java
+XxxProtocol protocolInstance = ExtensionFactory.getExtensionFactory(XxxProtocol.class).getExtension("xxx");
+```
 
 ## SPI Features
 
