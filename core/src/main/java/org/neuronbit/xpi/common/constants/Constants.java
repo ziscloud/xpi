@@ -28,25 +28,11 @@ public interface Constants {
 
     String REMOVE_VALUE_PREFIX = "-";
 
-    String UNDERLINE_SEPARATOR = "_";
-
-    String SEPARATOR_REGEX = "_|-";
-
-    String HIDE_KEY_PREFIX = ".";
-
-    String DOT_REGEX = "\\.";
-
     String DEFAULT_KEY = "default";
 
     String ANYHOST_VALUE = "0.0.0.0";
 
     String LOCALHOST_VALUE = "127.0.0.1";
-
-    String GROUP_KEY = "group";
-
-    String INTERFACE_KEY = "interface";
-
-    String VERSION_KEY = "version";
 
     /**
      * Pseudo URL prefix for loading from the class path: "classpath:".
