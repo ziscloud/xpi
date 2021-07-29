@@ -16,6 +16,8 @@
  */
 package org.neuronbit.xpi.common.extension;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.activate.ActivateExt1;
 import org.neuronbit.xpi.common.extension.activate.impl.ActivateExt1Impl1;
@@ -42,16 +44,11 @@ import org.neuronbit.xpi.common.extension.injection.InjectExt;
 import org.neuronbit.xpi.common.extension.injection.impl.InjectExtImpl;
 import org.neuronbit.xpi.common.lang.Prioritized;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.neuronbit.xpi.common.extension.ExtensionClassLoader.getLoadingStrategies;
-import static org.neuronbit.xpi.common.extension.ExtensionFactory.getExtensionFactory;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -62,6 +59,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.neuronbit.xpi.common.extension.ExtensionClassLoader.getLoadingStrategies;
+import static org.neuronbit.xpi.common.extension.ExtensionFactory.getExtensionFactory;
 
 public class ExtensionFactoryTest {
     @Test
@@ -309,49 +308,6 @@ public class ExtensionFactoryTest {
         }
     }
 
-    /*@Test
-    public void testLoadActivateExtension() throws Exception {
-        // test default
-        URL url = URL.valueOf("test://localhost/test");
-        List<ActivateExt1> list = getExtensionFactory(ActivateExt1.class)
-                .getActivateExtension(url, new String[]{}, "default_group");
-        Assertions.assertEquals(1, list.size());
-        Assertions.assertSame(list.get(0).getClass(), ActivateExt1Impl1.class);
-
-        // test group
-        url = url.addParameter(GROUP_KEY, "group1");
-        list = getExtensionFactory(ActivateExt1.class)
-                .getActivateExtension(url, new String[]{}, "group1");
-        Assertions.assertEquals(1, list.size());
-        Assertions.assertSame(list.get(0).getClass(), GroupActivateExtImpl.class);
-
-        // test old @Activate group
-        url = url.addParameter(GROUP_KEY, "old_group");
-        list = getExtensionFactory(ActivateExt1.class)
-                .getActivateExtension(url, new String[]{}, "old_group");
-        Assertions.assertEquals(2, list.size());
-        Assertions.assertTrue(list.get(0).getClass() == OldActivateExt1Impl2.class
-                || list.get(0).getClass() == OldActivateExt1Impl3.class);
-
-        // test value
-        url = url.removeParameter(GROUP_KEY);
-        url = url.addParameter(GROUP_KEY, "value");
-        url = url.addParameter("value", "value");
-        list = getExtensionFactory(ActivateExt1.class)
-                .getActivateExtension(url, new String[]{}, "value");
-        Assertions.assertEquals(1, list.size());
-        Assertions.assertSame(list.get(0).getClass(), ValueActivateExtImpl.class);
-
-        // test order
-        url = URL.valueOf("test://localhost/test");
-        url = url.addParameter(GROUP_KEY, "order");
-        list = getExtensionFactory(ActivateExt1.class)
-                .getActivateExtension(url, new String[]{}, "order");
-        Assertions.assertEquals(2, list.size());
-        Assertions.assertSame(list.get(0).getClass(), OrderActivateExtImpl1.class);
-        Assertions.assertSame(list.get(1).getClass(), OrderActivateExtImpl2.class);
-    }*/
-
     @Test
     public void testLoadDefaultActivateExtension() throws Exception {
         // test default
@@ -408,6 +364,7 @@ public class ExtensionFactoryTest {
     }
 
     /**
+     *
      */
     @Test
     public void testGetLoadingStrategies() {
@@ -447,7 +404,7 @@ public class ExtensionFactoryTest {
         } catch (IllegalStateException expected) {
             assertThat(expected.getMessage(), containsString("Failed to load extension class (interface: interface org.neuronbit.xpi.common.extension.duplicated.DuplicatedWithoutOverriddenExt"));
             assertThat(expected.getMessage(), containsString("cause: Duplicate extension org.neuronbit.xpi.common.extension.duplicated.DuplicatedWithoutOverriddenExt name duplicated"));
-        }finally {
+        } finally {
             //recover the loading strategies
             ExtensionClassLoader.setLoadingStrategies(loadingStrategies.toArray(new LoadingStrategy[loadingStrategies.size()]));
         }
