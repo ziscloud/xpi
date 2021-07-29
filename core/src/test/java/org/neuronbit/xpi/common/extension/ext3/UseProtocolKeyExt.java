@@ -19,14 +19,15 @@ package org.neuronbit.xpi.common.extension.ext3;
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.Adaptive;
 import org.neuronbit.xpi.common.extension.SPI;
+import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 
 @SPI("impl1")
 public interface UseProtocolKeyExt {
     // protocol key is the second
     @Adaptive({"key1", "protocol"})
-    String echo(ActivateCriteria url, String s);
+    String echo(SimpleParam url, String s);
 
     // protocol key is the first
     @Adaptive({"protocol", "key2"})
-    String yell(ActivateCriteria url, String s);
+    String yell(SimpleParam url, String s);
 }

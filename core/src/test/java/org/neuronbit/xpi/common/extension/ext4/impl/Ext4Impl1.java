@@ -22,6 +22,6 @@ import java.util.List;
 
 public class Ext4Impl1 implements NoUrlParamExt {
     public String bark(String name, List<Object> list) {
-        return null;
+        return "Ext4Impl1";
     }
 }

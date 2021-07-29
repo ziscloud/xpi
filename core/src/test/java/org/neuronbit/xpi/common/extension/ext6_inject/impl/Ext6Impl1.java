@@ -18,10 +18,12 @@ package org.neuronbit.xpi.common.extension.ext6_inject.impl;
 
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.ext1.SimpleExt;
+import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 import org.neuronbit.xpi.common.extension.ext6_inject.Dao;
 import org.neuronbit.xpi.common.extension.ext6_inject.Ext6;
 
 import org.junit.jupiter.api.Assertions;
+import org.neuronbit.xpi.common.extension.ext6_inject.SimpleParamExt6;
 
 public class Ext6Impl1 implements Ext6 {
     public Dao obj;
@@ -36,7 +38,7 @@ public class Ext6Impl1 implements Ext6 {
         this.ext1 = ext1;
     }
 
-    public String echo(ActivateCriteria url, String s) {
+    public String echo(SimpleParamExt6 url, String s) {
         return "Ext6Impl1-echo-" + ext1.echo(url, s);
     }
 

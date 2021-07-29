@@ -19,6 +19,7 @@ package org.neuronbit.xpi.common.extension.ext6_inject;
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.Adaptive;
 import org.neuronbit.xpi.common.extension.SPI;
+import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 
 /**
  * No default
@@ -26,5 +27,5 @@ import org.neuronbit.xpi.common.extension.SPI;
 @SPI
 public interface Ext6 {
     @Adaptive
-    String echo(ActivateCriteria url, String s);
+    String echo(SimpleParamExt6 url, String s);
 }

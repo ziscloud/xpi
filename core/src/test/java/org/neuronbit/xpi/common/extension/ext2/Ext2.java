@@ -19,6 +19,7 @@ package org.neuronbit.xpi.common.extension.ext2;
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.Adaptive;
 import org.neuronbit.xpi.common.extension.SPI;
+import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 
 /**
  * Has no default
@@ -27,7 +28,7 @@ import org.neuronbit.xpi.common.extension.SPI;
 public interface Ext2 {
     // one of the properties of an argument is an instance of URL.
     @Adaptive
-    String echo(UrlHolder holder, String s);
+    String echo(SimpleParam holder, String s);
 
-    String bang(ActivateCriteria url, int i);
+    String bang(SimpleParam url, int i);
 }

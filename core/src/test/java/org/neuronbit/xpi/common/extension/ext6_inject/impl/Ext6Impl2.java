@@ -17,7 +17,9 @@
 package org.neuronbit.xpi.common.extension.ext6_inject.impl;
 
 import org.neuronbit.xpi.common.ActivateCriteria;
+import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 import org.neuronbit.xpi.common.extension.ext6_inject.Ext6;
+import org.neuronbit.xpi.common.extension.ext6_inject.SimpleParamExt6;
 
 import java.util.List;
 
@@ -32,7 +34,7 @@ public class Ext6Impl2 implements Ext6 {
         this.list = list;
     }
 
-    public String echo(ActivateCriteria url, String s) {
+    public String echo(SimpleParamExt6 url, String s) {
         throw new UnsupportedOperationException();
     }
 

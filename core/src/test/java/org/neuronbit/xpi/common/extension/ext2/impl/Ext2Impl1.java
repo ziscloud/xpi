@@ -17,15 +17,16 @@
 package org.neuronbit.xpi.common.extension.ext2.impl;
 
 import org.neuronbit.xpi.common.ActivateCriteria;
+import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 import org.neuronbit.xpi.common.extension.ext2.Ext2;
 import org.neuronbit.xpi.common.extension.ext2.UrlHolder;
 
 public class Ext2Impl1 implements Ext2 {
-    public String echo(UrlHolder holder, String s) {
+    public String echo(SimpleParam holder, String s) {
         return "Ext2Impl1-echo";
     }
 
-    public String bang(ActivateCriteria url, int i) {
+    public String bang(SimpleParam url, int i) {
         return "bang1";
     }
 }

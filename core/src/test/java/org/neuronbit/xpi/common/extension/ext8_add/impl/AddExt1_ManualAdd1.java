@@ -18,9 +18,10 @@ package org.neuronbit.xpi.common.extension.ext8_add.impl;
 
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.ext8_add.AddExt1;
+import org.neuronbit.xpi.common.extension.ext8_add.SimpleParamExt8;
 
 public class AddExt1_ManualAdd1 implements AddExt1 {
-    public String echo(ActivateCriteria url, String s) {
+    public String echo(SimpleParamExt8 url, String s) {
         return this.getClass().getSimpleName();
     }
 }

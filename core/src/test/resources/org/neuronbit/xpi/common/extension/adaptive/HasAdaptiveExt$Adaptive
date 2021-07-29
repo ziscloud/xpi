@@ -17,11 +17,12 @@
 package org.neuronbit.xpi.common.extension.adaptive;
 import org.neuronbit.xpi.common.extension.ExtensionFactory;
 public class HasAdaptiveExt$Adaptive implements org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt {
-public java.lang.String echo(org.neuronbit.xpi.common.ActivateCriteria arg0, java.lang.String arg1)  {
-if (arg0 == null) throw new IllegalArgumentException("url == null");
-org.neuronbit.xpi.common.ActivateCriteria url = arg0;
-String extName = url.getParameter("has.adaptive.ext", "adaptive");
-if(extName == null) throw new IllegalStateException("Failed to get extension (org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt) name from url (" + url.toString() + ") use keys([has.adaptive.ext])");
+public java.lang.String echo(org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExtParam arg0, java.lang.String arg1)  {
+java.lang.String extName = "adaptive";
+if (arg0 != null && arg0.getHasAdaptiveExt() != null) {
+extName = arg0.getHasAdaptiveExt();
+}
+if(extName == null) throw new IllegalStateException("Failed to get extension (org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt) name from parameters by keys([HasAdaptiveExt])");
 org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt extension = (org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt)ExtensionFactory.getExtensionFactory(org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt.class).getExtension(extName);
 return extension.echo(arg0, arg1);
 }

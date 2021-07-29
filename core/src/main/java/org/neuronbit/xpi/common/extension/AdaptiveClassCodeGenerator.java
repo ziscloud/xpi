@@ -19,13 +19,11 @@ package org.neuronbit.xpi.common.extension;
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.logger.Logger;
 import org.neuronbit.xpi.common.logger.LoggerFactory;
-import org.neuronbit.xpi.common.utils.StringUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -57,10 +55,10 @@ public class AdaptiveClassCodeGenerator {
     private static final String CODE_EXT_NAME_ASSIGNMENT = "String extName = %s;\n";
 
     private static final String CODE_EXT_NAME_NULL_CHECK = "if(extName == null) "
-                    + "throw new IllegalStateException(\"Failed to get extension (%s) name from url (\" + url.toString() + \") use keys(%s)\");\n";
+                                                                   + "throw new IllegalStateException(\"Failed to get extension (%s) name from parameters by keys(%s)\");\n";
 
     private static final String CODE_INVOCATION_ARGUMENT_NULL_CHECK = "if (arg%d == null) throw new IllegalArgumentException(\"invocation == null\"); "
-                    + "String methodName = arg%d.getMethodName();\n";
+                                                                              + "String methodName = arg%d.getMethodName();\n";
 
 
     private static final String CODE_EXTENSION_ASSIGNMENT = "%s extension = (%<s)%s.getExtensionFactory(%s.class).getExtension(extName);\n";
@@ -140,13 +138,22 @@ public class AdaptiveClassCodeGenerator {
     /**
      * get index of parameter with type URL
      */
-    private int getUrlTypeIndex(Method method) {
+    private int getUrlTypeIndex(Method method, String[] values) {
         int urlTypeIndex = -1;
-        Class<?>[] pts = method.getParameterTypes();
-        for (int i = 0; i < pts.length; ++i) {
-            if (pts[i].equals(ActivateCriteria.class)) {
-                urlTypeIndex = i;
-                break;
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        for (int i = 0; i < parameterTypes.length; ++i) {
+            final Class<?> parameterType = parameterTypes[i];
+            for (Method m : parameterType.getMethods()) {
+                String name = m.getName();
+                for (String value : values) {
+                    if (name.equalsIgnoreCase("get" + value)
+                                && Modifier.isPublic(m.getModifiers())
+                                && !Modifier.isStatic(m.getModifiers())
+                                && m.getParameterTypes().length == 0
+                                && m.getReturnType() == String.class) {
+                        return i;
+                    }
+                }
             }
         }
         return urlTypeIndex;
@@ -170,8 +177,8 @@ public class AdaptiveClassCodeGenerator {
     private String generateMethodArguments(Method method) {
         Class<?>[] pts = method.getParameterTypes();
         return IntStream.range(0, pts.length)
-                        .mapToObj(i -> String.format(CODE_METHOD_ARGUMENT, pts[i].getCanonicalName(), i))
-                        .collect(Collectors.joining(", "));
+                       .mapToObj(i -> String.format(CODE_METHOD_ARGUMENT, pts[i].getCanonicalName(), i))
+                       .collect(Collectors.joining(", "));
     }
 
     /**
@@ -203,25 +210,12 @@ public class AdaptiveClassCodeGenerator {
         if (adaptiveAnnotation == null) {
             return generateUnsupported(method);
         } else {
-            int urlTypeIndex = getUrlTypeIndex(method);
-
-            // found parameter in URL type
-            if (urlTypeIndex != -1) {
-                // Null Point check
-                code.append(generateUrlNullCheck(urlTypeIndex));
-            } else {
-                // did not find parameter in URL type
-                code.append(generateUrlAssignmentIndirectly(method));
-            }
-
             String[] value = getMethodAdaptiveValue(adaptiveAnnotation);
 
-//            boolean hasInvocation = hasInvocationArgument(method);
+            code.append(generateUrlAssignmentIndirectly(method, value));
 
-//            code.append(generateInvocationArgumentNullCheck(method));
-
-            code.append(generateExtNameAssignment(value));
-            // check extName == null?
+            //code.append(generateExtNameAssignment(value));
+            //check extName == null?
             code.append(generateExtNameNullCheck(value));
 
             code.append(generateExtensionAssignment());
@@ -249,36 +243,12 @@ public class AdaptiveClassCodeGenerator {
         for (int i = value.length - 1; i >= 0; --i) {
             if (i == value.length - 1) {
                 if (null != defaultExtName) {
-                    //if (!"protocol".equals(value[i])) {
-//                        if (hasInvocation) {
-//                            getNameCode = String.format("url.getMethodParameter(methodName, \"%s\", \"%s\")", value[i], defaultExtName);
-//                        } else {
-                            getNameCode = String.format("url.getParameter(\"%s\", \"%s\")", value[i], defaultExtName);
-//                        }
-//                    } else {
-//                        getNameCode = String.format("( url.getProtocol() == null ? \"%s\" : url.getProtocol() )", defaultExtName);
-//                    }
+                    getNameCode = String.format("url.getParameter(\"%s\", \"%s\")", value[i], defaultExtName);
                 } else {
-//                    if (!"protocol".equals(value[i])) {
-//                        if (hasInvocation) {
-//                            getNameCode = String.format("url.getMethodParameter(methodName, \"%s\", \"%s\")", value[i], defaultExtName);
-//                        } else {
-                            getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
-//                        }
-//                    } else {
-//                        getNameCode = "url.getProtocol()";
-//                    }
+                    getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
                 }
             } else {
-//                if (!"protocol".equals(value[i])) {
-//                    if (hasInvocation) {
-//                        getNameCode = String.format("url.getMethodParameter(methodName, \"%s\", \"%s\")", value[i], defaultExtName);
-//                    } else {
-                        getNameCode = String.format("url.getParameter(\"%s\", %s)", value[i], getNameCode);
-//                    }
-//                } else {
-//                    getNameCode = String.format("url.getProtocol() == null ? (%s) : url.getProtocol()", getNameCode);
-//                }
+                getNameCode = String.format("url.getParameter(\"%s\", %s)", value[i], getNameCode);
             }
         }
 
@@ -299,29 +269,11 @@ public class AdaptiveClassCodeGenerator {
         String returnStatement = method.getReturnType().equals(void.class) ? "" : "return ";
 
         String args = IntStream.range(0, method.getParameters().length)
-                .mapToObj(i -> String.format(CODE_EXTENSION_METHOD_INVOKE_ARGUMENT, i))
-                .collect(Collectors.joining(", "));
+                              .mapToObj(i -> String.format(CODE_EXTENSION_METHOD_INVOKE_ARGUMENT, i))
+                              .collect(Collectors.joining(", "));
 
         return returnStatement + String.format("extension.%s(%s);\n", method.getName(), args);
     }
-
-    /**
-     * test if method has argument of type <code>Invocation</code>
-     */
-//    private boolean hasInvocationArgument(Method method) {
-//        Class<?>[] pts = method.getParameterTypes();
-//        return Arrays.stream(pts).anyMatch(p -> CLASSNAME_INVOCATION.equals(p.getName()));
-//    }
-
-    /**
-     * generate code to test argument of type <code>Invocation</code> is null
-     */
-//    private String generateInvocationArgumentNullCheck(Method method) {
-//        Class<?>[] pts = method.getParameterTypes();
-//        return IntStream.range(0, pts.length).filter(i -> CLASSNAME_INVOCATION.equals(pts[i].getName()))
-//                        .mapToObj(i -> String.format(CODE_INVOCATION_ARGUMENT_NULL_CHECK, i, i))
-//                        .findFirst().orElse("");
-//    }
 
     /**
      * get value of adaptive annotation or if empty return splitted simple name
@@ -330,8 +282,7 @@ public class AdaptiveClassCodeGenerator {
         String[] value = adaptiveAnnotation.value();
         // value is not set, use the value generated from class name as the key
         if (value.length == 0) {
-            String splitName = StringUtils.camelToSplitName(type.getSimpleName(), ".");
-            value = new String[]{splitName};
+            value = new String[]{type.getSimpleName()};
         }
         return value;
     }
@@ -343,20 +294,23 @@ public class AdaptiveClassCodeGenerator {
      * <p>
      * if not found, throws IllegalStateException
      */
-    private String generateUrlAssignmentIndirectly(Method method) {
+    private String generateUrlAssignmentIndirectly(Method method, String[] values) {
         Class<?>[] pts = method.getParameterTypes();
 
-        Map<String, Integer> getterReturnUrl = new HashMap<>();
+        LinkedHashMap<String, Integer> getterReturnUrl = new LinkedHashMap<>();
         // find URL getter method
-        for (int i = 0; i < pts.length; ++i) {
-            for (Method m : pts[i].getMethods()) {
-                String name = m.getName();
-                if ((name.startsWith("get") || name.length() > 3)
-                        && Modifier.isPublic(m.getModifiers())
-                        && !Modifier.isStatic(m.getModifiers())
-                        && m.getParameterTypes().length == 0
-                        && m.getReturnType() == ActivateCriteria.class) {
-                    getterReturnUrl.put(name, i);
+        for (int j = (values.length - 1); j >= 0; j--) {
+            String value = values[j];
+            for (int i = 0; i < pts.length; ++i) {
+                for (Method m : pts[i].getMethods()) {
+                    String name = m.getName();
+                    if (name.equalsIgnoreCase("get" + value)
+                                && Modifier.isPublic(m.getModifiers())
+                                && !Modifier.isStatic(m.getModifiers())
+                                && m.getParameterTypes().length == 0
+                                && m.getReturnType() == String.class) {
+                        getterReturnUrl.put(name, i);
+                    }
                 }
             }
         }
@@ -364,15 +318,19 @@ public class AdaptiveClassCodeGenerator {
         if (getterReturnUrl.size() <= 0) {
             // getter method not found, throw
             throw new IllegalStateException("Failed to create adaptive class for interface " + type.getName()
-                    + ": not found url parameter or url attribute in parameters of method " + method.getName());
-        }
-
-        Integer index = getterReturnUrl.get("getUrl");
-        if (index != null) {
-            return generateGetUrlNullCheck(index, pts[index], "getUrl");
+                                                    + ": not found url parameter or url attribute in parameters of method " + method.getName());
         } else {
-            Map.Entry<String, Integer> entry = getterReturnUrl.entrySet().iterator().next();
-            return generateGetUrlNullCheck(entry.getValue(), pts[entry.getValue()], entry.getKey());
+            StringBuilder code = new StringBuilder();
+            if (null == defaultExtName) {
+                code.append(String.format("%s extName = null;\n", String.class.getName()));
+            } else {
+                code.append(String.format("%s extName = \"%s\";\n", String.class.getName(), defaultExtName));
+            }
+            getterReturnUrl.forEach((name, paramIndex) -> {
+                code.append(generateGetUrlNullCheck(paramIndex, pts[paramIndex], name));
+            });
+
+            return code.toString();
         }
     }
 
@@ -384,12 +342,9 @@ public class AdaptiveClassCodeGenerator {
     private String generateGetUrlNullCheck(int index, Class<?> type, String method) {
         // Null point check
         StringBuilder code = new StringBuilder();
-        code.append(String.format("if (arg%d == null) throw new IllegalArgumentException(\"%s argument == null\");\n",
-                index, type.getName()));
-        code.append(String.format("if (arg%d.%s() == null) throw new IllegalArgumentException(\"%s argument %s() == null\");\n",
-                index, method, type.getName(), method));
-
-        code.append(String.format("%s url = arg%d.%s();\n", ActivateCriteria.class.getName(), index, method));
+        code.append(String.format("if (arg%d != null && arg%d.%s() != null) {\n", index, index, method));
+        code.append(String.format("extName = arg%d.%s();\n", index, method));
+        code.append("}\n");
         return code.toString();
     }
 

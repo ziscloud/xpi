@@ -26,5 +26,5 @@ import org.neuronbit.xpi.common.extension.SPI;
 @SPI("impl1")
 public interface AddExt1 {
     @Adaptive
-    String echo(ActivateCriteria url, String s);
+    String echo(SimpleParamExt8 url, String s);
 }

@@ -16,22 +16,24 @@
  */
 package org.neuronbit.xpi.common.extension;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt;
 import org.neuronbit.xpi.common.extension.adaptive.impl.HasAdaptiveExt_ManualAdaptive;
 import org.neuronbit.xpi.common.extension.ext1.SimpleExt;
+import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 import org.neuronbit.xpi.common.extension.ext2.Ext2;
 import org.neuronbit.xpi.common.extension.ext2.UrlHolder;
 import org.neuronbit.xpi.common.extension.ext3.UseProtocolKeyExt;
 import org.neuronbit.xpi.common.extension.ext4.NoUrlParamExt;
 import org.neuronbit.xpi.common.extension.ext5.NoAdaptiveMethodExt;
 import org.neuronbit.xpi.common.extension.ext6_inject.Ext6;
+import org.neuronbit.xpi.common.extension.ext6_inject.SimpleParamExt6;
 import org.neuronbit.xpi.common.extension.ext6_inject.impl.Ext6Impl2;
 import org.neuronbit.xpi.common.utils.LogUtil;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,21 +59,17 @@ public class ExtensionFactory_Adaptive_Test {
         {
             SimpleExt ext = ExtensionFactory.getExtensionFactory(SimpleExt.class).getAdaptiveExtension();
 
-            Map<String, String> map = new HashMap<>();
-            ActivateCriteria url = new ActivateCriteria(map);
-
-            String echo = ext.echo(url, "haha");
+            String echo = ext.echo(new SimpleParam(), "haha");
             assertEquals("Ext1Impl1-echo", echo);
         }
 
         {
             SimpleExt ext = ExtensionFactory.getExtensionFactory(SimpleExt.class).getAdaptiveExtension();
 
-            Map<String, String> map = new HashMap<String, String>();
-            map.put("simple.ext", "impl2");
-            ActivateCriteria url = new ActivateCriteria(map);
+            SimpleParam map = new SimpleParam();
+            map.setSimpleExt("impl2");
 
-            String echo = ext.echo(url, "haha");
+            String echo = ext.echo(map, "haha");
             assertEquals("Ext1Impl2-echo", echo);
         }
     }
@@ -80,20 +78,19 @@ public class ExtensionFactory_Adaptive_Test {
     public void test_getAdaptiveExtension_customizeAdaptiveKey() throws Exception {
         SimpleExt ext = ExtensionFactory.getExtensionFactory(SimpleExt.class).getAdaptiveExtension();
 
-        Map<String, String> map = new HashMap<>();
-        map.put("key2", "impl2");
-        map.put("protocol", "p1");
-        ActivateCriteria url = new ActivateCriteria(map);
+        SimpleParam map = new SimpleParam();
+        map.setKey2("impl2");
+        map.setProtocol("p1");
 
-        String echo = ext.yell(url, "haha");
+        String echo = ext.yell(map, "haha");
         assertEquals("Ext1Impl2-yell", echo);
 
-        Map<String, String> map2 = new HashMap<>();
-        map2.put("key2", "impl2");
-        map2.put("protocol", "p1");
-        map2.put("key1", "impl3");
-        ActivateCriteria url2 = new ActivateCriteria(map2); // note: URL is value's type
-        echo = ext.yell(url2, "haha");
+        SimpleParam map2 = new SimpleParam();
+        map2.setKey2("impl2");
+        map2.setProtocol("p1");
+        map2.setKey1("impl3");
+
+        echo = ext.yell(map2, "haha");
         assertEquals("Ext1Impl3-yell", echo);
     }
 
@@ -102,51 +99,38 @@ public class ExtensionFactory_Adaptive_Test {
         UseProtocolKeyExt ext = ExtensionFactory.getExtensionFactory(UseProtocolKeyExt.class).getAdaptiveExtension();
 
         {
-            String echo = ext.echo(new ActivateCriteria(), "s");
+            String echo = ext.echo(new SimpleParam(), "s");
             assertEquals("Ext3Impl1-echo", echo); // default value
 
-            Map<String, String> map = new HashMap<String, String>();
-            map.put("protocol", "impl3");
-            ActivateCriteria url = new ActivateCriteria(map);
+            SimpleParam map = new SimpleParam();
+            map.setProtocol("impl3");
 
-            echo = ext.echo(url, "s");
+            echo = ext.echo(map, "s");
             assertEquals("Ext3Impl3-echo", echo); // use 2nd key, protocol
 
 
-            Map<String, String> map2 = new HashMap<String, String>();
-            map2.put("protocol", "impl3");
-            map2.put("key1", "impl2");
-            ActivateCriteria url2 = new ActivateCriteria(map2);
-            echo = ext.echo(url2, "s");
+            SimpleParam map2 = new SimpleParam();
+            map2.setProtocol("impl3");
+            map2.setKey1("impl2");
+            echo = ext.echo(map2, "s");
             assertEquals("Ext3Impl2-echo", echo); // use 1st key, key1
         }
 
         {
 
-            Map<String, String> map = new HashMap<String, String>();
-            ActivateCriteria url = new ActivateCriteria(map);
-            String yell = ext.yell(url, "s");
+            SimpleParam map = new SimpleParam();
+            String yell = ext.yell(map, "s");
             assertEquals("Ext3Impl1-yell", yell); // default value
 
-            ActivateCriteria url2 = new ActivateCriteria("key2", "impl2"); // use 2nd key, key2
+            SimpleParam url2 = new SimpleParam();
+            url2.setKey2("impl2"); // use 2nd key, key2
             yell = ext.yell(url2, "s");
             assertEquals("Ext3Impl2-yell", yell);
 
-            ActivateCriteria url3 = new ActivateCriteria("protocol", "impl3"); // use 1st key, protocol
+            SimpleParam url3 = new SimpleParam();
+            url3.setProtocol("impl3"); // use 1st key, protocol
             yell = ext.yell(url3, "d");
             assertEquals("Ext3Impl3-yell", yell);
-        }
-    }
-
-    @Test
-    public void test_getAdaptiveExtension_UrlNpe() throws Exception {
-        SimpleExt ext = ExtensionFactory.getExtensionFactory(SimpleExt.class).getAdaptiveExtension();
-
-        try {
-            ext.echo(null, "haha");
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("url == null", e.getMessage());
         }
     }
 
@@ -175,11 +159,8 @@ public class ExtensionFactory_Adaptive_Test {
     public void test_getAdaptiveExtension_ExceptionWhenNotAdaptiveMethod() throws Exception {
         SimpleExt ext = ExtensionFactory.getExtensionFactory(SimpleExt.class).getAdaptiveExtension();
 
-        Map<String, String> map = new HashMap<String, String>();
-        ActivateCriteria url = new ActivateCriteria(map);
-
         try {
-            ext.bang(url, 33);
+            ext.bang(new SimpleParam(), 33);
             fail();
         } catch (UnsupportedOperationException expected) {
             assertThat(expected.getMessage(), containsString("method "));
@@ -204,12 +185,8 @@ public class ExtensionFactory_Adaptive_Test {
     public void test_urlHolder_getAdaptiveExtension() throws Exception {
         Ext2 ext = ExtensionFactory.getExtensionFactory(Ext2.class).getAdaptiveExtension();
 
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("ext2", "impl1");
-        ActivateCriteria url = new ActivateCriteria(map);
-
-        UrlHolder holder = new UrlHolder();
-        holder.setUrl(url);
+        SimpleParam holder = new SimpleParam();
+        holder.setExt2(  "impl1");
 
         String echo = ext.echo(holder, "haha");
         assertEquals("Ext2Impl1-echo", echo);
@@ -219,10 +196,7 @@ public class ExtensionFactory_Adaptive_Test {
     public void test_urlHolder_getAdaptiveExtension_noExtension() throws Exception {
         Ext2 ext = ExtensionFactory.getExtensionFactory(Ext2.class).getAdaptiveExtension();
 
-        ActivateCriteria url = new ActivateCriteria();
-
-        UrlHolder holder = new UrlHolder();
-        holder.setUrl(url);
+        SimpleParam holder = new SimpleParam();
 
         try {
             ext.echo(holder, "haha");
@@ -231,7 +205,7 @@ public class ExtensionFactory_Adaptive_Test {
             assertThat(expected.getMessage(), containsString("Failed to get extension"));
         }
 
-        holder.setUrl(new ActivateCriteria("ext2", "XXX"));
+        holder.setExt2("XXX");
         try {
             ext.echo(holder, "haha");
             fail();
@@ -247,15 +221,15 @@ public class ExtensionFactory_Adaptive_Test {
         try {
             ext.echo(null, "haha");
             fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("org.neuronbit.xpi.common.extension.ext2.UrlHolder argument == null", e.getMessage());
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(), containsString("Failed to get extension (org.neuronbit.xpi.common.extension.ext2.Ext2) name"));
         }
 
         try {
-            ext.echo(new UrlHolder(), "haha");
+            ext.echo(new SimpleParam(), "haha");
             fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("org.neuronbit.xpi.common.extension.ext2.UrlHolder argument getUrl() == null", e.getMessage());
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(), containsString("Failed to get extension (org.neuronbit.xpi.common.extension.ext2.Ext2) name"));
         }
     }
 
@@ -263,11 +237,8 @@ public class ExtensionFactory_Adaptive_Test {
     public void test_urlHolder_getAdaptiveExtension_ExceptionWhenNotAdativeMethod() throws Exception {
         Ext2 ext = ExtensionFactory.getExtensionFactory(Ext2.class).getAdaptiveExtension();
 
-        Map<String, String> map = new HashMap<String, String>();
-        ActivateCriteria url = new ActivateCriteria(map);
-
         try {
-            ext.bang(url, 33);
+            ext.bang(new SimpleParam(), 33);
             fail();
         } catch (UnsupportedOperationException expected) {
             assertThat(expected.getMessage(), containsString("method "));
@@ -281,24 +252,20 @@ public class ExtensionFactory_Adaptive_Test {
     public void test_urlHolder_getAdaptiveExtension_ExceptionWhenNameNotProvided() throws Exception {
         Ext2 ext = ExtensionFactory.getExtensionFactory(Ext2.class).getAdaptiveExtension();
 
-        ActivateCriteria url = new ActivateCriteria();
-
-        UrlHolder holder = new UrlHolder();
-        holder.setUrl(url);
-
+        final SimpleParam simpleParam = new SimpleParam();
         try {
-            ext.echo(holder, "impl1");
+            ext.echo(simpleParam, "impl1");
             fail();
         } catch (IllegalStateException expected) {
             assertThat(expected.getMessage(), containsString("Failed to get extension"));
         }
 
-        holder.setUrl(new ActivateCriteria("key1", "impl1"));
+        simpleParam.setKey1( "impl1");
         try {
-            ext.echo(holder, "haha");
+            ext.echo(simpleParam, "haha");
             fail();
         } catch (IllegalStateException expected) {
-            assertThat(expected.getMessage(), containsString("Failed to get extension (org.neuronbit.xpi.common.extension.ext2.Ext2) name from url"));
+            assertThat(expected.getMessage(), containsString("Failed to get extension (org.neuronbit.xpi.common.extension.ext2.Ext2) name from parameters"));
         }
     }
 
@@ -307,19 +274,19 @@ public class ExtensionFactory_Adaptive_Test {
         LogUtil.start();
         Ext6 ext = ExtensionFactory.getExtensionFactory(Ext6.class).getAdaptiveExtension();
 
-        ActivateCriteria url = new ActivateCriteria("ext6", "impl1");
+        SimpleParamExt6 url = new SimpleParamExt6();
+        url.setExt6("impl1");
 
         assertEquals("Ext6Impl1-echo-Ext1Impl1-echo", ext.echo(url, "ha"));
 
         Assertions.assertTrue(LogUtil.checkNoError(), "can not find error.");
         LogUtil.stop();
 
-        final HashMap<String, String> map = new HashMap<>();
-        map.put("protocol", "p1");
-        map.put("ext6", "impl1");
-        map.put("simple.ext", "impl2");
-        ActivateCriteria url2 = new ActivateCriteria(map);
-        assertEquals("Ext6Impl1-echo-Ext1Impl2-echo", ext.echo(url2, "ha"));
+        SimpleParamExt6 map = new SimpleParamExt6();
+        map.setProtocol("p1");
+        map.setExt6("impl1");
+        map.setSimpleExt("impl2");
+        assertEquals("Ext6Impl1-echo-Ext1Impl2-echo", ext.echo(map, "ha"));
 
     }
 

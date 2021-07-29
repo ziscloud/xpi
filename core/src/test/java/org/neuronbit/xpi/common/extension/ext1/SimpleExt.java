@@ -27,11 +27,11 @@ import org.neuronbit.xpi.common.extension.SPI;
 public interface SimpleExt {
     // @Adaptive example, do not specify a explicit key.
     @Adaptive
-    String echo(ActivateCriteria url, String s);
+    String echo(SimpleParam url, String s);
 
     @Adaptive({"key1", "key2"})
-    String yell(ActivateCriteria url, String s);
+    String yell(SimpleParam url, String s);
 
     // no @Adaptive
-    String bang(ActivateCriteria url, int i);
+    String bang(SimpleParam url, int i);
 }

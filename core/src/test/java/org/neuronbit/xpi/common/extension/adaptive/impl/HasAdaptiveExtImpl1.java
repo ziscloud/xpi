@@ -18,9 +18,10 @@ package org.neuronbit.xpi.common.extension.adaptive.impl;
 
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt;
+import org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExtParam;
 
 public class HasAdaptiveExtImpl1 implements HasAdaptiveExt {
-    public String echo(ActivateCriteria url, String s) {
+    public String echo(HasAdaptiveExtParam url, String s) {
         return this.getClass().getSimpleName();
     }
 }

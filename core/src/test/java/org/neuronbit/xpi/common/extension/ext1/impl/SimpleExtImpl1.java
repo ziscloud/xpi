@@ -18,17 +18,18 @@ package org.neuronbit.xpi.common.extension.ext1.impl;
 
 import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.ext1.SimpleExt;
+import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 
 public class SimpleExtImpl1 implements SimpleExt {
-    public String echo(ActivateCriteria url, String s) {
+    public String echo(SimpleParam url, String s) {
         return "Ext1Impl1-echo";
     }
 
-    public String yell(ActivateCriteria url, String s) {
+    public String yell(SimpleParam url, String s) {
         return "Ext1Impl1-yell";
     }
 
-    public String bang(ActivateCriteria url, int i) {
+    public String bang(SimpleParam url, int i) {
         return "bang1";
     }
 }

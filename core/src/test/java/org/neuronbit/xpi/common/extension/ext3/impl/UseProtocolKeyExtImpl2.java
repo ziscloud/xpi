@@ -17,14 +17,15 @@
 package org.neuronbit.xpi.common.extension.ext3.impl;
 
 import org.neuronbit.xpi.common.ActivateCriteria;
+import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 import org.neuronbit.xpi.common.extension.ext3.UseProtocolKeyExt;
 
 public class UseProtocolKeyExtImpl2 implements UseProtocolKeyExt {
-    public String echo(ActivateCriteria url, String s) {
+    public String echo(SimpleParam url, String s) {
         return "Ext3Impl2-echo";
     }
 
-    public String yell(ActivateCriteria url, String s) {
+    public String yell(SimpleParam url, String s) {
         return "Ext3Impl2-yell";
     }
 }
