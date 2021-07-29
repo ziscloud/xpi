@@ -1,3 +1,0 @@
-org.neuronbit.xpi.common.extension.InternalLoadingStrategy
-org.neuronbit.xpi.common.extension.DefaultLoadingStrategy
-org.neuronbit.xpi.common.extension.ServicesLoadingStrategy

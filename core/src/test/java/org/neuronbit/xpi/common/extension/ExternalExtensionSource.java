@@ -17,14 +17,13 @@
 package org.neuronbit.xpi.common.extension;
 
 /**
- * Default {@link LoadingStrategy}
- *
+ * External {@link ExtensionSource} for testing
  */
-public class DefaultLoadingStrategy implements LoadingStrategy {
+public class ExternalExtensionSource implements ExtensionSource {
 
     @Override
     public String directory() {
-        return "META-INF/xpi/";
+        return "META-INF/xpi/external/";
     }
 
     @Override
@@ -34,8 +33,6 @@ public class DefaultLoadingStrategy implements LoadingStrategy {
 
     @Override
     public int getPriority() {
-        return DEFAULT_PRIORITY;
+        return HIGHEST_PRIORITY + 1;
     }
-
-
 }

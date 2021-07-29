@@ -368,35 +368,35 @@ public class ExtensionFactoryTest {
      */
     @Test
     public void testGetLoadingStrategies() {
-        List<LoadingStrategy> strategies = getLoadingStrategies();
+        List<ExtensionSource> strategies = getLoadingStrategies();
 
         assertEquals(4, strategies.size());
 
         int i = 0;
 
-        LoadingStrategy loadingStrategy = strategies.get(i++);
-        assertEquals(InternalLoadingStrategy.class, loadingStrategy.getClass());
-        assertEquals(Prioritized.HIGHEST_PRIORITY, loadingStrategy.getPriority());
+        ExtensionSource extensionSource = strategies.get(i++);
+        assertEquals(InternalExtensionSource.class, extensionSource.getClass());
+        assertEquals(Prioritized.HIGHEST_PRIORITY, extensionSource.getPriority());
 
-        loadingStrategy = strategies.get(i++);
-        assertEquals(ExternalLoadingStrategy.class, loadingStrategy.getClass());
-        assertEquals(Prioritized.HIGHEST_PRIORITY + 1, loadingStrategy.getPriority());
+        extensionSource = strategies.get(i++);
+        assertEquals(ExternalExtensionSource.class, extensionSource.getClass());
+        assertEquals(Prioritized.HIGHEST_PRIORITY + 1, extensionSource.getPriority());
 
 
-        loadingStrategy = strategies.get(i++);
-        assertEquals(DefaultLoadingStrategy.class, loadingStrategy.getClass());
-        assertEquals(Prioritized.DEFAULT_PRIORITY, loadingStrategy.getPriority());
+        extensionSource = strategies.get(i++);
+        assertEquals(DefaultExtensionSource.class, extensionSource.getClass());
+        assertEquals(Prioritized.DEFAULT_PRIORITY, extensionSource.getPriority());
 
-        loadingStrategy = strategies.get(i++);
-        assertEquals(ServicesLoadingStrategy.class, loadingStrategy.getClass());
-        assertEquals(Prioritized.LOWEST_PRIORITY, loadingStrategy.getPriority());
+        extensionSource = strategies.get(i++);
+        assertEquals(ServicesExtensionSource.class, extensionSource.getClass());
+        assertEquals(Prioritized.LOWEST_PRIORITY, extensionSource.getPriority());
     }
 
     @Test
     public void testDuplicatedImplWithoutOverriddenStrategy() {
-        List<LoadingStrategy> loadingStrategies = getLoadingStrategies();
-        ExtensionClassLoader.setLoadingStrategies(new ExternalLoadingStrategyTest(false),
-                new InternalLoadingStrategyTest(false));
+        List<ExtensionSource> loadingStrategies = getLoadingStrategies();
+        ExtensionClassLoader.setLoadingStrategies(new ExternalExtensionSourceTest(false),
+                new InternalExtensionSourceTest(false));
         ExtensionFactory<DuplicatedWithoutOverriddenExt> extensionFactory = ExtensionFactory.getExtensionFactory(DuplicatedWithoutOverriddenExt.class);
         try {
             extensionFactory.getExtension("duplicated");
@@ -406,28 +406,28 @@ public class ExtensionFactoryTest {
             assertThat(expected.getMessage(), containsString("cause: Duplicate extension org.neuronbit.xpi.common.extension.duplicated.DuplicatedWithoutOverriddenExt name duplicated"));
         } finally {
             //recover the loading strategies
-            ExtensionClassLoader.setLoadingStrategies(loadingStrategies.toArray(new LoadingStrategy[loadingStrategies.size()]));
+            ExtensionClassLoader.setLoadingStrategies(loadingStrategies.toArray(new ExtensionSource[loadingStrategies.size()]));
         }
     }
 
     @Test
     public void testDuplicatedImplWithOverriddenStrategy() {
-        List<LoadingStrategy> loadingStrategies = getLoadingStrategies();
-        ExtensionClassLoader.setLoadingStrategies(new ExternalLoadingStrategyTest(true),
-                new InternalLoadingStrategyTest(true));
+        List<ExtensionSource> loadingStrategies = getLoadingStrategies();
+        ExtensionClassLoader.setLoadingStrategies(new ExternalExtensionSourceTest(true),
+                new InternalExtensionSourceTest(true));
         ExtensionFactory<DuplicatedOverriddenExt> extensionFactory = ExtensionFactory.getExtensionFactory(DuplicatedOverriddenExt.class);
         DuplicatedOverriddenExt duplicatedOverriddenExt = extensionFactory.getExtension("duplicated");
         assertEquals("DuplicatedOverriddenExt1", duplicatedOverriddenExt.echo());
         //recover the loading strategies
-        ExtensionClassLoader.setLoadingStrategies(loadingStrategies.toArray(new LoadingStrategy[loadingStrategies.size()]));
+        ExtensionClassLoader.setLoadingStrategies(loadingStrategies.toArray(new ExtensionSource[loadingStrategies.size()]));
     }
 
     /**
-     * The external {@link LoadingStrategy}, which can set if it support overridden
+     * The external {@link ExtensionSource}, which can set if it support overridden
      */
-    private static class ExternalLoadingStrategyTest implements LoadingStrategy {
+    private static class ExternalExtensionSourceTest implements ExtensionSource {
 
-        public ExternalLoadingStrategyTest(boolean overridden) {
+        public ExternalExtensionSourceTest(boolean overridden) {
             this.overridden = overridden;
         }
 
@@ -450,11 +450,11 @@ public class ExtensionFactoryTest {
     }
 
     /**
-     * The internal {@link LoadingStrategy}, which can set if it support overridden
+     * The internal {@link ExtensionSource}, which can set if it support overridden
      */
-    private static class InternalLoadingStrategyTest implements LoadingStrategy {
+    private static class InternalExtensionSourceTest implements ExtensionSource {
 
-        public InternalLoadingStrategyTest(boolean overridden) {
+        public InternalExtensionSourceTest(boolean overridden) {
             this.overridden = overridden;
         }
 

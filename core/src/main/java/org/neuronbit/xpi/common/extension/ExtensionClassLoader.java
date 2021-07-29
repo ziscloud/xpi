@@ -32,7 +32,7 @@ import static org.neuronbit.xpi.common.constants.Constants.COMMA_SPLIT_PATTERN;
 public class ExtensionClassLoader {
     private static final Logger logger = LoggerFactory.getLogger(ExtensionClassLoader.class);
 
-    private static LoadingStrategy[] strategies = loadLoadingStrategies();
+    private static ExtensionSource[] strategies = loadLoadingStrategies();
 
     private final Class<?> type;
 
@@ -54,28 +54,28 @@ public class ExtensionClassLoader {
     }
 
     /**
-     * Load all {@link Prioritized prioritized} {@link LoadingStrategy Loading Strategies} via {@link ServiceLoader}
+     * Load all {@link Prioritized prioritized} {@link ExtensionSource Loading Strategies} via {@link ServiceLoader}
      *
      * @return non-null
      */
-    private static LoadingStrategy[] loadLoadingStrategies() {
-        return stream(load(LoadingStrategy.class).spliterator(), false)
+    private static ExtensionSource[] loadLoadingStrategies() {
+        return stream(load(ExtensionSource.class).spliterator(), false)
                        .sorted()
-                       .toArray(LoadingStrategy[]::new);
+                       .toArray(ExtensionSource[]::new);
     }
 
     /**
-     * Get all {@link LoadingStrategy Loading Strategies}
+     * Get all {@link ExtensionSource Loading Strategies}
      *
      * @return non-null
-     * @see LoadingStrategy
+     * @see ExtensionSource
      * @see Prioritized
      */
-    public static List<LoadingStrategy> getLoadingStrategies() {
+    public static List<ExtensionSource> getLoadingStrategies() {
         return asList(strategies);
     }
 
-    public static void setLoadingStrategies(LoadingStrategy... strategies) {
+    public static void setLoadingStrategies(ExtensionSource... strategies) {
         if (ArrayUtils.isNotEmpty(strategies)) {
             ExtensionClassLoader.strategies = strategies;
         }
@@ -117,7 +117,7 @@ public class ExtensionClassLoader {
             }
 
             Map<String, Class<?>> extensionClasses = new HashMap<>();
-            for (LoadingStrategy strategy : strategies) {
+            for (ExtensionSource strategy : strategies) {
                 loadDirectory(extensionClasses, type.getName(), strategy);
             }
             cachedClasses.set(extensionClasses);
@@ -150,7 +150,7 @@ public class ExtensionClassLoader {
         return compiler.compile(code, classLoader);
     }
 
-    private void loadDirectory(Map<String, Class<?>> extensionClasses, String type, LoadingStrategy strategy) {
+    private void loadDirectory(Map<String, Class<?>> extensionClasses, String type, ExtensionSource strategy) {
         String fileName = strategy.directory() + type;
         try {
             Enumeration<URL> urls = null;

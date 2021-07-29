@@ -17,18 +17,24 @@
 package org.neuronbit.xpi.common.extension;
 
 /**
- * Internal {@link LoadingStrategy}
+ * Services {@link ExtensionSource}
  *
  */
-public class InternalLoadingStrategy implements LoadingStrategy {
+public class ServicesExtensionSource implements ExtensionSource {
 
     @Override
     public String directory() {
-        return "META-INF/xpi/internal/";
+        return "META-INF/services/";
+    }
+
+    @Override
+    public boolean overridden() {
+        return true;
     }
 
     @Override
     public int getPriority() {
-        return HIGHEST_PRIORITY;
+        return LOWEST_PRIORITY;
     }
+
 }

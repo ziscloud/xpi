@@ -18,7 +18,7 @@ package org.neuronbit.xpi.common.extension;
 
 import org.neuronbit.xpi.common.lang.Prioritized;
 
-public interface LoadingStrategy extends Prioritized {
+public interface ExtensionSource extends Prioritized {
 
     String directory();
 
@@ -31,7 +31,7 @@ public interface LoadingStrategy extends Prioritized {
     }
 
     /**
-     * Indicates current {@link LoadingStrategy} supports overriding other lower prioritized instances or not.
+     * Indicates current {@link ExtensionSource} supports overriding other lower prioritized instances or not.
      *
      * @return if supports, return <code>true</code>, or <code>false</code>
      */
