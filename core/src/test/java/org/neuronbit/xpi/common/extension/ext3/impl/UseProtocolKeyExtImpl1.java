@@ -16,7 +16,6 @@
  */
 package org.neuronbit.xpi.common.extension.ext3.impl;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 import org.neuronbit.xpi.common.extension.ext3.UseProtocolKeyExt;
 

@@ -18,13 +18,11 @@ package org.neuronbit.xpi.common.extension;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt;
 import org.neuronbit.xpi.common.extension.adaptive.impl.HasAdaptiveExt_ManualAdaptive;
 import org.neuronbit.xpi.common.extension.ext1.SimpleExt;
 import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 import org.neuronbit.xpi.common.extension.ext2.Ext2;
-import org.neuronbit.xpi.common.extension.ext2.UrlHolder;
 import org.neuronbit.xpi.common.extension.ext3.UseProtocolKeyExt;
 import org.neuronbit.xpi.common.extension.ext4.NoUrlParamExt;
 import org.neuronbit.xpi.common.extension.ext5.NoAdaptiveMethodExt;
@@ -32,10 +30,6 @@ import org.neuronbit.xpi.common.extension.ext6_inject.Ext6;
 import org.neuronbit.xpi.common.extension.ext6_inject.SimpleParamExt6;
 import org.neuronbit.xpi.common.extension.ext6_inject.impl.Ext6Impl2;
 import org.neuronbit.xpi.common.utils.LogUtil;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;

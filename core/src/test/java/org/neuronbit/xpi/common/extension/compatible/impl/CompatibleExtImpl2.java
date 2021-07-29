@@ -16,7 +16,7 @@
  */
 package org.neuronbit.xpi.common.extension.compatible.impl;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
+import org.neuronbit.xpi.common.extension.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.compatible.CompatibleExt;
 
 public class CompatibleExtImpl2 implements CompatibleExt {

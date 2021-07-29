@@ -16,8 +16,6 @@
  */
 package org.neuronbit.xpi.common.extension.ext6_inject.impl;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
-import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 import org.neuronbit.xpi.common.extension.ext6_inject.Ext6;
 import org.neuronbit.xpi.common.extension.ext6_inject.SimpleParamExt6;
 

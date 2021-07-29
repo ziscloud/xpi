@@ -16,7 +16,7 @@
  */
 package org.neuronbit.xpi.common.extension.ext7.impl;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
+import org.neuronbit.xpi.common.extension.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.ext7.InitErrorExt;
 
 public class Ext7Impl implements InitErrorExt {

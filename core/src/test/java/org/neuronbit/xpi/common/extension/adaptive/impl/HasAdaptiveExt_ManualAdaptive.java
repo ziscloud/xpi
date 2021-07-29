@@ -16,12 +16,10 @@
  */
 package org.neuronbit.xpi.common.extension.adaptive.impl;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.Adaptive;
 import org.neuronbit.xpi.common.extension.ExtensionFactory;
 import org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExt;
 import org.neuronbit.xpi.common.extension.adaptive.HasAdaptiveExtParam;
-import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 
 @Adaptive
 public class HasAdaptiveExt_ManualAdaptive implements HasAdaptiveExt {

@@ -16,7 +16,7 @@
  */
 package org.neuronbit.xpi.common.extension.ext7;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
+import org.neuronbit.xpi.common.extension.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.Adaptive;
 import org.neuronbit.xpi.common.extension.SPI;
 

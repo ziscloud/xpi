@@ -16,7 +16,6 @@
  */
 package org.neuronbit.xpi.common.extension;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.context.Lifecycle;
 import org.neuronbit.xpi.common.extension.inject.DisableInject;
 import org.neuronbit.xpi.common.extension.inject.InjectProvider;

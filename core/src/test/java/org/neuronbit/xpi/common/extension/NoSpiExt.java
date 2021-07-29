@@ -16,8 +16,6 @@
  */
 package org.neuronbit.xpi.common.extension;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
-
 /**
  * Has no SPI annotation
  */

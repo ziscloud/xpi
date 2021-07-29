@@ -16,10 +16,8 @@
  */
 package org.neuronbit.xpi.common.extension.ext2.impl;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 import org.neuronbit.xpi.common.extension.ext2.Ext2;
-import org.neuronbit.xpi.common.extension.ext2.UrlHolder;
 
 public class Ext2Impl3 implements Ext2 {
     public String echo(SimpleParam holder, String s) {

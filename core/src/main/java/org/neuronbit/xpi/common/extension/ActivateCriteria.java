@@ -1,4 +1,4 @@
-package org.neuronbit.xpi.common;
+package org.neuronbit.xpi.common.extension;
 
 import java.util.HashMap;
 import java.util.Map;

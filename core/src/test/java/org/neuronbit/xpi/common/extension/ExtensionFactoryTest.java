@@ -18,7 +18,6 @@ package org.neuronbit.xpi.common.extension;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.activate.ActivateExt1;
 import org.neuronbit.xpi.common.extension.activate.impl.ActivateExt1Impl1;
 import org.neuronbit.xpi.common.extension.activate.impl.OrderActivateExtImpl1;

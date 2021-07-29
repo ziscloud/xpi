@@ -16,7 +16,7 @@
  */
 package org.neuronbit.xpi.common.extension.ext2;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
+import org.neuronbit.xpi.common.extension.ActivateCriteria;
 
 public class UrlHolder {
     private Double Num;

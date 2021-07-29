@@ -16,7 +16,7 @@
  */
 package org.neuronbit.xpi.common.extension.ext6_wrap.impl;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
+import org.neuronbit.xpi.common.extension.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.ext6_wrap.WrappedExt;
 
 public class Ext5Impl2 implements WrappedExt {

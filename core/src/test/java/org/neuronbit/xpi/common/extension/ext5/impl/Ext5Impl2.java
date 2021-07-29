@@ -16,7 +16,7 @@
  */
 package org.neuronbit.xpi.common.extension.ext5.impl;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
+import org.neuronbit.xpi.common.extension.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.ext5.NoAdaptiveMethodExt;
 
 public class Ext5Impl2 implements NoAdaptiveMethodExt {

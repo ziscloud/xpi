@@ -17,10 +17,8 @@
 
 package org.neuronbit.xpi.common.extension.adaptive;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.extension.Adaptive;
 import org.neuronbit.xpi.common.extension.SPI;
-import org.neuronbit.xpi.common.extension.ext1.SimpleParam;
 
 @SPI
 public interface HasAdaptiveExt {

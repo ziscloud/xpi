@@ -16,8 +16,6 @@
  */
 package org.neuronbit.xpi.common.extension;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
-
 import java.lang.annotation.*;
 
 /**

@@ -16,7 +16,6 @@
  */
 package org.neuronbit.xpi.common.extension;
 
-import org.neuronbit.xpi.common.ActivateCriteria;
 import org.neuronbit.xpi.common.logger.Logger;
 import org.neuronbit.xpi.common.logger.LoggerFactory;
 
