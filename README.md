@@ -1,21 +1,25 @@
 # xpi
-Extended Java SPI, based on the source code of [dubbo](https://dubbo.apache.org), but remove the dependent of URL.
+Extended Java extension, based on the source code of [dubbo](https://dubbo.apache.org), but remove the dependent of URL.
 
-XPI is inherited from standard JDK SPI(Service Provider Interface) and makes it more powerful.
+XPI is inherited from standard JDK extension(Service Provider Interface) and makes it more powerful.
 
-XPI fixed below issues of the standard JDK SPI:
+XPI fixed below issues of the standard JDK extension:
 
-* The standard JDK SPI will load and instantize all the implementations at once. It will be a waste of resources if one implementation is timecosted, but never be used.
-* We can’t accquire the SPI name, if loading the SPI implementation is failed.For example: standard JDK ScriptEngine, get script type by invoking method getName(). RubyScriptEngine class will load failed if the depenency jar jruby.jar is missing, and the real error info will be lost. When user executes ruby scripts, the program throws exception that doesn’t support ruby, but it is not the real cause.
-* Enhance the SPI functionality by supporting IoC and AOP, one SPI can be easily injected by another SPI simply using setter.
+* The standard JDK extension will load and instantize all the implementations at once. It will be a waste of resources if one implementation is timecosted, but never be used.
+* We can’t accquire the extension name, if loading the extension implementation is failed.For example: standard JDK ScriptEngine, get script type by invoking method getName(). RubyScriptEngine class will load failed if the depenency jar jruby.jar is missing, and the real error info will be lost. When user executes ruby scripts, the program throws exception that doesn’t support ruby, but it is not the real cause.
+* Enhance the extension functionality by supporting IoC and AOP, one extension can be easily injected by another extension simply using setter.
 
 ## Appointment:
 
-In the jar file containing extension class 1, places a config file META-INF/dubbo/full interface name, file content pattern: SPI name=the fully qualified name for the extension class, use new line seperator for multiple implementation.
+In the jar file containing extension class 1, places a config file META-INF/xpi/<full interface name>, file content pattern: 
+
+*extension name=the fully qualified name for the extension class*
+
+use new line seperator for multiple implementation.
 
 ## Example:
 
-To extend Dubbo Protocol, place a text file in the extension jar file: META-INF/dubbo/org.neuronbit.xpi.rpc.Protocol, content:
+To extend `Protocol`, place a text file in the extension jar file: `META-INF/xpi/org.neuronbit.xpi.rpc.Protocol`, content:
 
 ```text
 xxx=org.neuronbit.xxx.XxxProtocol
@@ -38,20 +42,21 @@ get the extensino instanc via:
 XxxProtocol protocolInstance = ExtensionFactory.getExtensionFactory(XxxProtocol.class).getExtension("xxx");
 ```
 
-## SPI Features
+## extension Features
 
-### SPI Auto Wrap
+### extension Auto Wrap
 
-Auto wrap the SPI’s Wrapper class. ExtensionLoader loads the SPI implementation, if the SPI has a copy instructor, it will be regarded as the SPI’s Wrapper class.
+Auto wrap the extension’s Wrapper class. ExtensionFactory loads the extension implementation, if the extension has a copy instructor, it will be regarded as the extension’s Wrapper class.
 
 Wrapper class content:
+
 ```java
 package org.neuronbit.xxx;
 
 import org.neuronbit.xpi.rpc.Protocol;
 
 public class XxxProtocolWrapper implements Protocol {
-Protocol impl;
+    private Protocol impl;
 
     public XxxProtocolWrapper(Protocol protocol) { impl = protocol; }
  
@@ -66,19 +71,19 @@ Protocol impl;
 }
 ```
 
-Wrapper class also implements the same SPI interface, but Wrapper is not the real implementation. It is used for wrap the real implementation returned from the ExtensionLoader. The real returned instance by ExtensionLoader is the Wrapper class instance, Wrapper holder the real SPI implementation class.
+Wrapper class also implements the same extension interface, but Wrapper is not the real implementation. It is used for wrap the real implementation returned from the ExtensionFactory. The real returned instance by ExtensionFactory is the Wrapper class instance, Wrapper holder the real extension implementation class.
 
-There can be many Wrapper for one spi, simply add one if you need.
+There can be more than one Wrapper for an extension, just simply add if you need.
 
-With Wrapper class, you will be able to move same logics into Wrapper for all SPIs. Newly added Wrapper class add external logics for all SPIs, looks like AOP, Wrapper acts as a proxy for SPI.
+With Wrapper class, you will be able to add same logics into Wrapper for all extensions, like AOP, Wrapper acts as a proxy for extension.
 
-### SPI Auto Load
+### extension Auto Load
 
-when loading the SPI, Dubbo will auto load the depency SPI. When one SPI implementation contains attribute which is also an SPI of another type,ExtensionLoader will automatically load the depency SPI. ExtensionLoader knows all the members of the specific SPI by scanning the setter method of all implementation class.
+when loading the extension, Dubbo will auto load the depency extension. When one extension implementation contains attribute which is also an extension of another type,ExtensionFactory will automatically load the depency extension. ExtensionFactory knows all the members of the specific extension by scanning the setter method of all implementation class.
 
-Demo: two SPI CarMaker（car maker）、WheelMaker (wheel maker)
+Demo: two extension CarMaker（car maker）、WheelMaker (wheel maker)
 
-Intefaces look like:
+Interfaces are:
 
 ```java
 public interface CarMaker {
@@ -109,27 +114,29 @@ WheelMaker wheelMaker;
 }
 ```
 
-when ExtensionLoader loads CarMaker’s implementation RaceCarMaker, the method setWheelMaker needs paramType WheelMaker which is also a SPI, It will be automatically loaded.
+when ExtensionFactory loads RaceCarMaker, the method setWheelMaker needs a parameter of WheelMaker type which is also an extension, It will be automatically loaded.
 
-This brings a new question:How ExtensionLoader determines which implementation to use when load the injected SPI. As for this demo, when existing multi WheelMaker implementation, which one should the ExtensionLoader chooses.
+This brings a new question: How ExtensionFactory determines which implementation to use when load the injected extension. 
 
-Good question, we will explain it in the following chapter: SPI Auto Adaptive.
+As for this demo, when existing multi WheelMaker implementation, which one should the ExtensionFactory choose.
 
-### SPI Auto Adaptive
+This problem is solved with: extension Auto Adaptive.
 
-The depency SPI that ExtensionLoader injects is an instance of Adaptive, the real spi implementation is known until the adaptive instance is executed.
+### extension Auto Adaptive
+
+The extension that ExtensionFactory injects is an instance of Adaptive, the real extension implementation is known until the adaptive instance is executed.
 
 Dubbo use URL (containing Key-Value) to pass the configuration.
 
-The SPI method invocation has the URL parameter（Or Entity that has URL attribute）
+The extension method invocation has the URL parameter（Or Entity that has URL attribute）
 
-In this way depended SPI can get configuration from URL, after config all SPI key needed, configuration information will be passed from outer by URL. URL acts as a bus when passing the config information.
+In this way depended extension can get configuration from URL, after config all extension key needed, configuration information will be passed from outer by URL. URL acts as a bus when passing the config information.
 
-Demo: two SPI CarMaker、WheelMaker
+Demo: two extension CarMaker、WheelMaker
 
-```java
 interface looks like:
 
+```java
 public interface CarMaker {
 Car makeCar(URL url);
 }
@@ -157,7 +164,9 @@ WheelMaker wheelMaker;
     }
 }
 ```
+
 when execute the code above
+
 ```java
 // ...
 Wheel wheel = wheelMaker.makeWheel(url);
@@ -166,9 +175,9 @@ Wheel wheel = wheelMaker.makeWheel(url);
 ```
 , the injected Adaptive object determine which WheelMaker’s makeWheel method will be executed by predefined Key. Such as wheel.type, key url.get("wheel.type") will determine WheelMake implementation. The logic ofAdaptive instance of fixed, getting the predefined Key of the URL, dynamically creating the real implementation and execute it.
 
-For Dubbo, the SPI Adaptive implementation in ExtensionLoader is dynamically created when dubbo is loading the SPI. Get the Key from URL, the Key will be provided through @Adaptive annotation for the interface method definition.
+For Dubbo, the extension Adaptive implementation in ExtensionFactory is dynamically created when dubbo is loading the extension. Get the Key from URL, the Key will be provided through @Adaptive annotation for the interface method definition.
 
-Below is Dubbo Transporter SPI codes:
+Below is Dubbo Transporter extension codes:
 
 ```java
 public interface Transporter {
@@ -182,9 +191,9 @@ Server bind(URL url, ChannelHandler handler) throws RemotingException;
 
 for the method bind(), Adaptive will firstly search server key, if no Key were founded then will search transport key, to determine the implementation that the proxy represent for.
 
-SPI Auto Activation
+## extension Auto Activation
 
-As for Collections SPI, such as: Filter, InvokerListener, ExportListener, TelnetHandler, StatusChecker etc, multi implementations can be loaded at one time. User can simplify configuration by using auto activation, Like:
+As for Collections extension, such as: Filter, InvokerListener, ExportListener, TelnetHandler, StatusChecker etc, multi implementations can be loaded at one time. User can simplify configuration by using auto activation, Like:
 ```java
 import org.neuronbit.xpi.common.extension.Activate;
 import org.neuronbit.xpi.rpc.Filter;
@@ -199,11 +208,11 @@ Or:
 import org.neuronbit.xpi.common.extension.Activate;
 import org.neuronbit.xpi.rpc.Filter;
 
-@Activate("xxx") // when configed xxx parameter and the parameter has a valid value,the SPI is activated, for example configed cache="lru", auto acitivate CacheFilter.
+@Activate("xxx") // when configed xxx parameter and the parameter has a valid value,the extension is activated, for example configed cache="lru", auto acitivate CacheFilter.
 public class XxxFilter implements Filter {
 // ...
 }
-```
+```                       
 Or:
 ```java
 import org.neuronbit.xpi.common.extension.Activate;
@@ -216,7 +225,7 @@ public class XxxFilter implements Filter {
 ```
 Note: The config file here is in you own jar file, not in dubbo release jar file, Dubbo will scan all jar files with the same filename in classpath and then merge them together ↩︎
 
-Note: SPI will be loaded in singleton pattern(Please ensure thread safety), cached in ExtensionLoader ↩︎
+Note: extension will be loaded in singleton pattern(Please ensure thread safety), cached in ExtensionFactory ↩︎
 
 # License
 
